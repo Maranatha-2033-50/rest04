@@ -54,13 +54,7 @@ function ExamInfo({ data }) {
               에듀포커스 학습 과정
             </p>
             <ul className="space-y-3">
-              {[
-                'AI 취약점 진단 테스트',
-                '영역별 취약 유형 분석 리포트 제공',
-                '맞춤 집중 학습 루틴 설계',
-                '취약점 집중 문제 반복 훈련',
-                '정기 모의시험 및 진도 점검',
-              ].map((step, i) => (
+              {data.learningSteps.map((step, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-300">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full
                                    bg-brand-royal dark:bg-brand-sky text-white dark:text-gray-950

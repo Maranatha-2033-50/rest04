@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import SubPageLayout from '../components/SubPageLayout'
-import { subjectsPages } from '../data/site'
+import { subjectsPages, subjectFeatures } from '../data/site'
 
 const tabs = [
   { label: '영어', to: '/subjects/english' },
@@ -37,13 +37,7 @@ function SubjectContent({ data }) {
               취약 단원 집중 과외 과정
             </p>
             <ul className="space-y-3">
-              {[
-                '진단 평가로 취약 단원 및 유형 파악',
-                '단원별 취약 원인 분석 및 개념 재정립',
-                '취약 유형 집중 문제 풀이',
-                '오답 패턴 분석 및 반복 훈련',
-                '내신·수능 실전 문제 적용 연습',
-              ].map((s, i) => (
+              {data.learningSteps.map((s, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-300">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full
                                    bg-brand-royal dark:bg-brand-sky text-white dark:text-gray-950
@@ -64,12 +58,7 @@ function SubjectContent({ data }) {
               과외 특징
             </p>
             <ul className="space-y-4">
-              {[
-                { icon: '🎯', title: '취약점 정밀 진단', desc: 'AI 진단 테스트로 취약한 단원·유형을 빠르게 파악합니다' },
-                { icon: '📊', title: '맞춤 학습 루틴', desc: '개인별 취약 패턴에 따른 최적화된 학습 계획을 제공합니다' },
-                { icon: '🔄', title: '반복 훈련 시스템', desc: '취약 유형 집중 반복으로 완전 학습을 달성합니다' },
-                { icon: '📈', title: '진도 추적 관리', desc: '주간 성취도 리포트로 학습 진도를 체계적으로 관리합니다' },
-              ].map((f) => (
+              {subjectFeatures.map((f) => (
                 <li key={f.title} className="flex items-start gap-4">
                   <span className="text-2xl">{f.icon}</span>
                   <div>

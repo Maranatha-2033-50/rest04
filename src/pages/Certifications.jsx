@@ -48,13 +48,7 @@ function CertContent({ data }) {
               집중 학습 과정
             </p>
             <ul className="space-y-3">
-              {[
-                'AI 취약 영역 진단 테스트',
-                '과목/단원별 취약점 분석 리포트',
-                '취약 단원 집중 개념 정리',
-                '기출 유형 반복 풀이 루틴',
-                '최신 기출 모의고사 및 피드백',
-              ].map((step, i) => (
+              {data.learningSteps.map((step, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-300">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full
                                    bg-brand-royal dark:bg-brand-sky text-white dark:text-gray-950
@@ -75,12 +69,7 @@ function CertContent({ data }) {
               이런 분께 추천드립니다
             </p>
             <ul className="space-y-3">
-              {[
-                `${data.title} 첫 도전으로 어디서 시작해야 할지 모르는 분`,
-                '기출을 여러 번 풀었지만 점수가 오르지 않는 분',
-                '특정 과목/단원에서 반복적으로 실수하는 분',
-                '단기간에 합격 점수를 달성해야 하는 분',
-              ].map((t, i) => (
+              {data.targetAudience.map((t, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-300">
                   <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand-amber" />
                   {t}

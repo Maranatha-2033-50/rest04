@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import SubPageLayout from '../components/SubPageLayout'
-import { company } from '../data/site'
+import { company, aboutServices, aboutHistory } from '../data/site'
 
 const tabs = [
   { label: '대표 인사말', to: '/about/greeting' },
@@ -54,29 +54,6 @@ function Greeting() {
 }
 
 function Services() {
-  const services = [
-    {
-      icon: '🌐', title: '어학 — IELTS · DELF',
-      desc: 'IELTS와 DELF A1~C2 전 레벨에 걸쳐 영역별 취약점 분석과 집중 학습 루틴을 제공합니다.',
-      tags: ['IELTS', 'DELF A1-A2', 'DELF B1-B2', 'DELF C1-C2'],
-    },
-    {
-      icon: '📋', title: '자격증 집중 학습',
-      desc: '컴퓨터활용능력, 정보처리기사, 한국사능력검정 합격을 위한 단계별 취약점 집중 학습을 제공합니다.',
-      tags: ['컴활 1·2급', '정보처리기사', '한능검 심화·기본'],
-    },
-    {
-      icon: '📚', title: '교과목 과외',
-      desc: '영어·수학·과학·국어 핵심 교과목에서 취약 단원을 집중 보완하는 맞춤 과외 서비스입니다.',
-      tags: ['영어', '수학', '과학', '국어'],
-    },
-    {
-      icon: '🤖', title: 'AI 취약점 분석 앱',
-      desc: '학습 데이터를 AI로 분석해 취약점 리포트·맞춤 루틴·집중 문제를 자동 제공하는 앱입니다.',
-      tags: ['취약점 분석', '맞춤 루틴', '집중 문제'],
-    },
-  ]
-
   return (
     <div className="mx-auto max-w-container section-x">
       <div className="mb-12 text-center">
@@ -84,7 +61,7 @@ function Services() {
         <h3 className="text-3xl font-extrabold text-brand-navy dark:text-white">에듀포커스 핵심 서비스</h3>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {services.map((s) => (
+        {aboutServices.map((s) => (
           <div key={s.title} className="card p-8">
             <div className="text-4xl mb-4">{s.icon}</div>
             <h4 className="mb-3 text-xl font-bold text-brand-navy dark:text-white">{s.title}</h4>
@@ -102,13 +79,6 @@ function Services() {
 }
 
 function History() {
-  const milestones = [
-    { year: '2026', event: 'AI 학습앱 v2.0 출시 — 취약점 리포트 고도화' },
-    { year: '2025', event: 'DELF C1·C2 과정 및 정보처리기사 집중 과정 런칭' },
-    { year: '2024', event: 'AI 기반 취약점 분석 엔진 자체 개발 · 특허 출원' },
-    { year: '2023', event: '에듀포커스 설립 · IELTS·컴활·한능검 서비스 시작' },
-  ]
-
   return (
     <div className="mx-auto max-w-container section-x">
       <div className="mb-12 text-center">
@@ -116,7 +86,7 @@ function History() {
         <h3 className="text-3xl font-extrabold text-brand-navy dark:text-white">에듀포커스의 발자취</h3>
       </div>
       <div className="relative border-l-2 border-brand-royal/30 dark:border-brand-sky/30 pl-10 space-y-10">
-        {milestones.map((m) => (
+        {aboutHistory.map((m) => (
           <div key={m.year} className="relative">
             <div className="absolute -left-[2.85rem] flex h-8 w-8 items-center justify-center rounded-full
                             bg-brand-royal dark:bg-brand-sky text-white dark:text-gray-950

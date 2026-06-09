@@ -1,48 +1,5 @@
 import { Link } from 'react-router-dom'
-import { videoTopics } from '../data/site'
-
-const features = [
-  {
-    icon: '🔍',
-    title: '취약점 정밀 분석',
-    desc: '문제 풀이 데이터를 분석해 단원·유형·문항 수준별로 취약점을 정밀하게 파악합니다.',
-  },
-  {
-    icon: '🗺️',
-    title: '맞춤 학습 루틴 설계',
-    desc: '취약점 분석 결과를 기반으로 목표 점수 달성까지 최단 경로의 학습 루틴을 자동 설계합니다.',
-  },
-  {
-    icon: '📝',
-    title: '취약점 집중 문제 제공',
-    desc: 'AI가 취약 유형에 특화된 문제를 선별·생성하여 반복 훈련이 가능한 문제 세트를 제공합니다.',
-  },
-  {
-    icon: '📊',
-    title: '학습 진도 리포트',
-    desc: '주간·월간 학습 성취도 리포트로 취약점 개선 현황과 목표 달성률을 한눈에 확인합니다.',
-  },
-  {
-    icon: '🔔',
-    title: '스마트 복습 알림',
-    desc: '망각 곡선 기반으로 복습 타이밍을 자동 계산하여 최적의 시점에 알림을 보냅니다.',
-  },
-  {
-    icon: '🎯',
-    title: '목표 점수 시뮬레이션',
-    desc: '현재 학습 속도와 취약점 개선 추이를 분석해 목표 시험일 예상 점수를 시뮬레이션합니다.',
-  },
-]
-
-const supportedExams = [
-  { label: 'IELTS', sub: 'Band 5~9' },
-  { label: 'DELF A1·A2', sub: '프랑스어 입문·기초' },
-  { label: 'DELF B1·B2', sub: '프랑스어 중급' },
-  { label: 'DELF C1·C2', sub: '프랑스어 고급' },
-  { label: '컴퓨터활용능력', sub: '1급·2급' },
-  { label: '정보처리기사', sub: '필기·실기' },
-  { label: '한국사능력검정', sub: '심화·기본' },
-]
+import { videoTopics, aiAppFeatures, aiAppSupportedExams } from '../data/site'
 
 function HeroSection() {
   return (
@@ -96,7 +53,7 @@ function FeaturesSection() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => (
+          {aiAppFeatures.map((f) => (
             <div key={f.title} className="card p-7 hover:shadow-md transition-shadow">
               <div className="mb-4 text-4xl">{f.icon}</div>
               <h3 className="mb-3 text-lg font-bold text-brand-navy dark:text-white">{f.title}</h3>
@@ -120,7 +77,7 @@ function SupportedExams() {
           </h2>
         </div>
         <div className="flex flex-wrap justify-center gap-4">
-          {supportedExams.map((e) => (
+          {aiAppSupportedExams.map((e) => (
             <div key={e.label} className="card px-6 py-4 text-center min-w-[140px]">
               <p className="font-bold text-brand-royal dark:text-brand-sky">{e.label}</p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{e.sub}</p>
