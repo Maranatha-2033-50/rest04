@@ -1,4 +1,5 @@
 import { termsContent, privacyContent } from '../data/site'
+import { useLang } from '../context/LanguageContext'
 
 const contentMap = {
   terms: termsContent,
@@ -6,10 +7,13 @@ const contentMap = {
 }
 
 function LegalContent({ data, isPrivacy }) {
+  const { lang } = useLang()
+  const current = data[lang] ?? data.ko
+
   return (
     <div className="mx-auto max-w-3xl section-x py-16 md:py-24">
       <div className="card overflow-hidden">
-        {/* 문서 상단 메타 */}
+        {/* 문서 헤더 */}
         <div className={[
           'px-8 py-6 border-b border-gray-100 dark:border-gray-800',
           isPrivacy
@@ -26,18 +30,14 @@ function LegalContent({ data, isPrivacy }) {
             'text-sm',
             isPrivacy ? 'text-white/60' : 'text-neutral-500 dark:text-neutral-400',
           ].join(' ')}>
-            최종 업데이트: {data.ko.lastUpdated} &nbsp;·&nbsp; Last updated: {data.en.lastUpdated}
+            {lang === 'ko' ? `최종 업데이트: ${current.lastUpdated}` : `Last updated: ${current.lastUpdated}`}
           </p>
         </div>
 
-        {/* 한국어 본문 */}
-        <div className="px-8 py-8 border-b border-gray-100 dark:border-gray-800">
-          <div className="mb-5 flex items-center gap-3">
-            <span className="badge">한국어</span>
-          </div>
-          <div className="space-y-6 max-h-96 overflow-y-auto pr-2
-                          scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
-            {data.ko.sections.map((sec, i) => (
+        {/* 본문 — 현재 lang에 해당하는 섹션만 렌더링 */}
+        <div className="px-8 py-8">
+          <div className="space-y-7">
+            {current.sections.map((sec, i) => (
               <div key={i}>
                 <h3 className={[
                   'mb-2 text-sm font-bold',
@@ -54,44 +54,17 @@ function LegalContent({ data, isPrivacy }) {
             ))}
           </div>
         </div>
-
-        {/* 영문 본문 */}
-        <div className="px-8 py-8">
-          <div className="mb-5 flex items-center gap-3">
-            <span className="badge border-brand-sky/30 bg-brand-sky/10 text-brand-sky">English</span>
-            {isPrivacy && (
-              <span className="text-xs text-neutral-400 dark:text-neutral-500">
-                PIPEDA &amp; Global Privacy Standards
-              </span>
-            )}
-          </div>
-          <div className="space-y-6 max-h-96 overflow-y-auto pr-2
-                          scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
-            {data.en.sections.map((sec, i) => (
-              <div key={i}>
-                <h3 className={[
-                  'mb-2 text-sm font-bold',
-                  isPrivacy
-                    ? 'text-brand-royal dark:text-brand-sky'
-                    : 'text-brand-navy dark:text-neutral-200',
-                ].join(' ')}>
-                  {sec.heading}
-                </h3>
-                <p className="text-sm leading-7 text-neutral-600 dark:text-neutral-400">
-                  {sec.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   )
 }
 
 export default function SimplePage({ title, contentKey }) {
+  const { lang } = useLang()
   const content = contentKey ? contentMap[contentKey] : null
   const isPrivacy = contentKey === 'privacy'
+
+  const breadcrumb = lang === 'ko' ? `홈 / ${title}` : `Home / ${title}`
 
   return (
     <div>
@@ -104,7 +77,7 @@ export default function SimplePage({ title, contentKey }) {
       ].join(' ')}>
         <div className="section-x text-center">
           <p className="text-xs font-semibold tracking-widest text-brand-sky/80 uppercase mb-3">
-            홈 / {title}
+            {breadcrumb}
           </p>
           <h1 className={[
             'font-extrabold text-white md:text-5xl',
@@ -114,7 +87,9 @@ export default function SimplePage({ title, contentKey }) {
           </h1>
           {isPrivacy && (
             <p className="mt-4 text-white/70 text-sm">
-              개인정보는 소중히 보호됩니다 · Your privacy is protected
+              {lang === 'ko'
+                ? '개인정보는 소중히 보호됩니다'
+                : 'Your privacy is our priority'}
             </p>
           )}
         </div>

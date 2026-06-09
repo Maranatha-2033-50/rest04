@@ -45,10 +45,18 @@ export const company = {
   ],
 }
 
+// ── Study Mate 앱 ────────────────────────────────────────────
+export const studyMateApp = {
+  url: 'https://study-mate-nine-phi.vercel.app',
+  label: { ko: 'Study Mate 앱 바로가기', en: 'Go to Study Mate App' },
+}
+
 // ── 상단 GNB ────────────────────────────────────────────────
+// label 필드: { ko, en } 객체 — useLang().t() 로 현재 언어 추출
+// children label: 한국어 문자열 유지 (추후 다국어 확장 시 동일 패턴 적용)
 export const nav = [
   {
-    label: '어학',
+    label: { ko: '어학', en: 'Languages' },
     to: '/languages/ielts',
     children: [
       { label: 'IELTS', to: '/languages/ielts' },
@@ -58,7 +66,7 @@ export const nav = [
     ],
   },
   {
-    label: '자격증',
+    label: { ko: '자격증', en: 'Certifications' },
     to: '/certifications/computer',
     children: [
       { label: '컴퓨터활용능력', to: '/certifications/computer' },
@@ -67,7 +75,7 @@ export const nav = [
     ],
   },
   {
-    label: '교과목',
+    label: { ko: '교과목', en: 'Subjects' },
     to: '/subjects/english',
     children: [
       { label: '영어', to: '/subjects/english' },
@@ -77,7 +85,7 @@ export const nav = [
     ],
   },
   {
-    label: '학습 동영상',
+    label: { ko: '학습 동영상', en: 'Learning Videos' },
     to: '/videos/ielts',
     children: [
       { label: 'IELTS 영상', to: '/videos/ielts' },
@@ -89,7 +97,7 @@ export const nav = [
     ],
   },
   {
-    label: 'AI 학습앱',
+    label: { ko: 'AI 학습앱', en: 'AI Learning App' },
     to: '/ai-app',
     children: [
       { label: '앱 소개', to: '/ai-app' },
@@ -98,7 +106,7 @@ export const nav = [
     ],
   },
   {
-    label: '회사소개',
+    label: { ko: '회사소개', en: 'About Us' },
     to: '/about/greeting',
     children: [
       { label: '대표 인사말', to: '/about/greeting' },
@@ -142,6 +150,42 @@ export const notices = [
   { id: 3, title: 'DELF B2·C1 무료 취약점 진단 이벤트 (6월)', date: '2026.05.25' },
   { id: 2, title: '정보처리기사 2차 실기 대비 집중 특강 오픈', date: '2026.05.18' },
   { id: 1, title: 'AI 학습앱 v2.0 업데이트 — 취약점 리포트 기능 강화', date: '2026.05.10' },
+]
+
+// ── 메인 홈 — 히어로 슬라이더 ───────────────────────────────
+// 슬라이드 1: {ko, en} 완전 다국어화
+// 슬라이드 2·3: 한국어 문자열 유지 (t()가 문자열 그대로 반환)
+export const heroSlides = [
+  {
+    tagline: {
+      ko: '내 취약점을 알면,\n합격이 보입니다',
+      en: 'Know Your Weaknesses,\nAchieve Your Goals',
+    },
+    sub: {
+      ko: 'AI 기반 취약점 분석으로 나만의 집중 학습 루틴을 설계합니다',
+      en: 'Design your personalized study routine with AI-powered weak-point analysis',
+    },
+    cta: {
+      label: { ko: 'AI 취약점 진단 시작', en: 'Start AI Diagnosis' },
+      to: '/ai-app',
+    },
+    accent: {
+      ko: 'IELTS · DELF · 컴활 · 정처기 · 한능검',
+      en: 'IELTS · DELF · CompA · IT Eng · K-History',
+    },
+  },
+  {
+    tagline: '어학부터 자격증까지,\n당신의 합격을 함께',
+    sub: 'IELTS, DELF, 컴퓨터활용능력, 정보처리기사, 한국사능력검정 전문 학습 플랫폼',
+    cta: { label: '서비스 둘러보기', to: '/languages/ielts' },
+    accent: '취약 단원 집중 공략 · 맞춤 루틴 설계',
+  },
+  {
+    tagline: '유튜브 학습 TIP과\nAI 앱으로 자기주도학습',
+    sub: '주제별 학습 TIP 영상과 AI 취약점 분석 앱으로 혼자서도 합격할 수 있습니다',
+    cta: { label: '학습 동영상 보기', to: '/videos/ielts' },
+    accent: 'IELTS · DELF · 컴활 · 정처기 · 한능검 · AI앱 활용',
+  },
 ]
 
 // ── 어학 ─────────────────────────────────────────────────────

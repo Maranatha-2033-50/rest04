@@ -1,35 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { serviceCards, notices, videoTopics } from '../data/site'
-
-const heroSlides = [
-  {
-    tagline: '내 취약점을 알면,\n합격이 보입니다',
-    sub: 'AI 기반 취약점 분석으로 나만의 집중 학습 루틴을 설계합니다',
-    cta: { label: 'AI 취약점 진단 시작', to: '/ai-app' },
-    accent: 'IELTS · DELF · 컴활 · 정처기 · 한능검',
-  },
-  {
-    tagline: '어학부터 자격증까지,\n당신의 합격을 함께',
-    sub: 'IELTS, DELF, 컴퓨터활용능력, 정보처리기사, 한국사능력검정 전문 학습 플랫폼',
-    cta: { label: '서비스 둘러보기', to: '/languages/ielts' },
-    accent: '취약 단원 집중 공략 · 맞춤 루틴 설계',
-  },
-  {
-    tagline: '유튜브 학습 TIP과\nAI 앱으로 자기주도학습',
-    sub: '주제별 학습 TIP 영상과 AI 취약점 분석 앱으로 혼자서도 합격할 수 있습니다',
-    cta: { label: '학습 동영상 보기', to: '/videos/ielts' },
-    accent: 'IELTS · DELF · 컴활 · 정처기 · 한능검 · AI앱 활용',
-  },
-]
+import { serviceCards, notices, videoTopics, heroSlides } from '../data/site'
+import { useLang } from '../context/LanguageContext'
 
 function Hero() {
+  const { t } = useLang()
   const [idx, setIdx] = useState(0)
   const go = (dir) => setIdx((i) => (i + dir + heroSlides.length) % heroSlides.length)
 
   useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % heroSlides.length), 5500)
-    return () => clearInterval(t)
+    const timer = setInterval(() => setIdx((i) => (i + 1) % heroSlides.length), 5500)
+    return () => clearInterval(timer)
   }, [])
 
   const s = heroSlides[idx]
@@ -48,21 +29,20 @@ function Hero() {
       />
 
       <div className="relative z-10 mx-auto w-full max-w-container section-x py-24">
-        {/* 슬라이드 컨텐츠 */}
         <div className="transition-all duration-700">
           <span className="badge mb-6 inline-block border border-brand-sky/30 bg-brand-sky/10 text-brand-sky text-xs tracking-widest uppercase">
-            {s.accent}
+            {t(s.accent)}
           </span>
           <h1 className="mb-6 whitespace-pre-line text-5xl font-extrabold leading-tight text-white
                          md:text-7xl lg:text-8xl drop-shadow">
-            {s.tagline}
+            {t(s.tagline)}
           </h1>
           <p className="mb-10 max-w-2xl text-lg text-white/80 leading-relaxed md:text-xl">
-            {s.sub}
+            {t(s.sub)}
           </p>
           <div className="flex flex-wrap gap-4">
             <Link to={s.cta.to} className="btn-primary text-base px-8 py-3.5 shadow-lg">
-              {s.cta.label} →
+              {t(s.cta.label)} →
             </Link>
             <Link to="/videos/ielts"
               className="inline-flex items-center gap-2 rounded-full border border-white/40

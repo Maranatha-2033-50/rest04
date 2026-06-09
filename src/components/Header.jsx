@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { nav, company } from '../data/site'
+import { useLang } from '../context/LanguageContext'
 
 function SunIcon() {
   return (
@@ -20,6 +21,7 @@ function MoonIcon() {
 }
 
 export default function Header() {
+  const { lang, toggleLang, t } = useLang()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hoveredIdx, setHoveredIdx] = useState(null)
   const [dark, setDark] = useState(() =>
@@ -52,11 +54,11 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* 데스크탑 메뉴 — 각 항목이 자체 드롭다운을 독립적으로 관리 */}
+          {/* 데스크탑 메뉴 */}
           <ul className="hidden items-stretch lg:flex">
             {nav.map((item, idx) => (
               <li
-                key={item.label}
+                key={idx}
                 className="relative flex items-center"
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
@@ -72,10 +74,9 @@ export default function Header() {
                     ].join(' ')
                   }
                 >
-                  {item.label}
+                  {t(item.label)}
                 </NavLink>
 
-                {/* 개별 드롭다운 — hoveredIdx === idx 일 때만 표시 */}
                 {hoveredIdx === idx && item.children?.length > 0 && (
                   <ul className="absolute left-1/2 top-full z-50 min-w-[160px] -translate-x-1/2
                                   rounded-xl border border-gray-100 dark:border-gray-800
@@ -89,7 +90,7 @@ export default function Header() {
                                      whitespace-nowrap hover:text-brand-royal dark:hover:text-brand-sky
                                      hover:bg-brand-light dark:hover:bg-gray-800 transition-colors"
                         >
-                          {c.label}
+                          {t(c.label)}
                         </Link>
                       </li>
                     ))}
@@ -99,8 +100,32 @@ export default function Header() {
             ))}
           </ul>
 
-          {/* 우측: 다크모드 토글 + 햄버거 */}
-          <div className="flex items-center gap-3">
+          {/* 우측: 언어 토글 + 다크모드 토글 + 햄버거 */}
+          <div className="flex items-center gap-2">
+            {/* KR / EN 언어 토글 */}
+            <button
+              type="button"
+              onClick={toggleLang}
+              aria-label={lang === 'ko' ? 'Switch to English' : '한국어로 전환'}
+              className="flex h-9 items-center gap-0.5 rounded-full border px-3
+                         border-gray-200 dark:border-gray-700
+                         text-xs font-bold transition-colors
+                         hover:border-brand-royal dark:hover:border-brand-sky"
+            >
+              <span className={lang === 'ko'
+                ? 'text-brand-royal dark:text-brand-sky'
+                : 'text-neutral-400 dark:text-neutral-600'}>
+                KR
+              </span>
+              <span className="mx-0.5 text-neutral-300 dark:text-neutral-700">·</span>
+              <span className={lang === 'en'
+                ? 'text-brand-royal dark:text-brand-sky'
+                : 'text-neutral-400 dark:text-neutral-600'}>
+                EN
+              </span>
+            </button>
+
+            {/* 다크모드 토글 */}
             <button
               type="button"
               aria-label={dark ? '라이트 모드로 전환' : '다크 모드로 전환'}
@@ -113,6 +138,7 @@ export default function Header() {
               {dark ? <SunIcon /> : <MoonIcon />}
             </button>
 
+            {/* 햄버거 (모바일) */}
             <button
               type="button"
               aria-label="메뉴 열기"
@@ -140,24 +166,41 @@ export default function Header() {
               <span className="text-xl font-extrabold text-brand-navy dark:text-brand-sky">
                 {company.name}
               </span>
-              <button
-                type="button"
-                aria-label="메뉴 닫기"
-                className="text-2xl text-neutral-500 dark:text-neutral-400"
-                onClick={() => setMobileOpen(false)}
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                {/* 모바일 언어 토글 */}
+                <button
+                  type="button"
+                  onClick={toggleLang}
+                  className="flex h-8 items-center gap-0.5 rounded-full border px-2.5
+                             border-gray-200 dark:border-gray-700 text-xs font-bold transition-colors"
+                >
+                  <span className={lang === 'ko'
+                    ? 'text-brand-royal dark:text-brand-sky'
+                    : 'text-neutral-400 dark:text-neutral-600'}>KR</span>
+                  <span className="mx-0.5 text-neutral-300 dark:text-neutral-700">·</span>
+                  <span className={lang === 'en'
+                    ? 'text-brand-royal dark:text-brand-sky'
+                    : 'text-neutral-400 dark:text-neutral-600'}>EN</span>
+                </button>
+                <button
+                  type="button"
+                  aria-label="메뉴 닫기"
+                  className="text-2xl text-neutral-500 dark:text-neutral-400"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <ul className="flex flex-col gap-2">
-              {nav.map((item) => (
-                <li key={item.label} className="border-b border-neutral-100 dark:border-gray-800 pb-2">
+              {nav.map((item, idx) => (
+                <li key={idx} className="border-b border-neutral-100 dark:border-gray-800 pb-2">
                   <Link
                     to={item.to}
                     className="block py-2 text-lg font-bold text-neutral-900 dark:text-neutral-100"
                     onClick={() => setMobileOpen(false)}
                   >
-                    {item.label}
+                    {t(item.label)}
                   </Link>
                   <ul className="flex flex-col">
                     {item.children?.map((c) => (
@@ -168,7 +211,7 @@ export default function Header() {
                                      hover:text-brand-royal dark:hover:text-brand-sky"
                           onClick={() => setMobileOpen(false)}
                         >
-                          {c.label}
+                          {t(c.label)}
                         </Link>
                       </li>
                     ))}

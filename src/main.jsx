@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
+import { LanguageProvider } from './context/LanguageContext.jsx'
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -30,7 +31,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
       <HashRouter>
-        <App />
+        <LanguageProvider>
+          <App />
+        </LanguageProvider>
       </HashRouter>
     </ErrorBoundary>
   </React.StrictMode>,

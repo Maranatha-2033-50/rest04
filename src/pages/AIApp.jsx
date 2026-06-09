@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
-import { videoTopics, aiAppFeatures, aiAppSupportedExams } from '../data/site'
+import { videoTopics, aiAppFeatures, aiAppSupportedExams, studyMateApp } from '../data/site'
+import { useLang } from '../context/LanguageContext'
 
 function HeroSection() {
+  const { t } = useLang()
+
   return (
     <section className="bg-gradient-to-br from-brand-navy via-brand-royal to-brand-sky
                         dark:from-gray-950 dark:via-brand-navy dark:to-brand-royal
@@ -29,10 +32,10 @@ function HeroSection() {
                          border border-white/30 px-8 py-3.5 text-base font-bold hover:bg-white/30 transition">
               <span>🤖</span> Android 다운로드
             </a>
-            <a href="https://study-mate-nine-phi.vercel.app" target="_blank" rel="noopener noreferrer"
+            <a href={studyMateApp.url} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-full bg-brand-amber text-white
                          px-8 py-3.5 text-base font-bold shadow-lg hover:brightness-110 transition">
-              <span>🚀</span> Study Mate 앱 바로가기
+              <span>🚀</span> {t(studyMateApp.label)}
             </a>
           </div>
         </div>
