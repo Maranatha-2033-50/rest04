@@ -1,94 +1,86 @@
 import { Link } from 'react-router-dom'
 import { company } from '../data/site'
-import Placeholder from './Placeholder'
 
-// ============================================================
-// 푸터 — 상단: 로고 + 회사 소개문 / 하단: 주소·Family site·정책링크
-// ============================================================
 export default function Footer() {
   return (
-    <footer className="relative">
-      {/* 상단 소개 영역 */}
-      <div className="mx-auto max-w-container px-4 py-20 md:px-10 lg:px-40">
-        <div className="flex flex-col items-start gap-8 md:flex-row md:items-center">
-          <div className="w-56 shrink-0">
-            <Placeholder label="LOGO" ratio="16/5" />
-          </div>
-          <div className="flex-grow text-base leading-7 text-neutral-700 md:text-[1.05rem]">
-            {company.intro.map((p, i) => (
-              <p key={i} className="mb-4 last:mb-0">
-                {p}
+    <footer className="mt-auto">
+      {/* 상단: 브랜드 소개 */}
+      <div className="bg-brand-light dark:bg-gray-900 transition-colors">
+        <div className="mx-auto max-w-container section-x py-16">
+          <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-16">
+            <div className="shrink-0">
+              <p className="text-2xl font-extrabold tracking-tight text-brand-navy dark:text-brand-sky">
+                {company.name}
               </p>
-            ))}
+              <p className="mt-1 text-sm font-medium text-brand-royal dark:text-brand-sky/70">
+                {company.slogan}
+              </p>
+            </div>
+            <div className="flex-grow space-y-3 text-sm leading-7 text-neutral-600 dark:text-neutral-400">
+              {company.intro.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 하단 다크 영역 */}
-      <div className="bg-black px-4 py-12 md:px-10 lg:px-40">
-        <div className="mx-auto flex max-w-container flex-col gap-10">
-          <div className="flex flex-col justify-between gap-8 md:flex-row">
+      {/* 하단: 주소·링크·카피라이트 */}
+      <div className="bg-brand-navy dark:bg-gray-950 text-white transition-colors">
+        <div className="mx-auto max-w-container section-x py-10">
+          <div className="flex flex-col gap-8 md:flex-row md:justify-between">
             {/* 주소 */}
-            <div className="flex flex-col gap-2.5 text-sm">
+            <div className="flex flex-col gap-3 text-sm">
               {company.offices.map((o) => (
-                <div
-                  key={o.label}
-                  className="flex flex-col gap-1 md:flex-row md:gap-8"
-                >
-                  <div className="w-14 shrink-0 font-bold text-neutral-200">
-                    {o.label}
-                  </div>
-                  <ul className="flex flex-col gap-1 font-medium text-neutral-400 md:flex-row md:gap-8">
-                    <li className="md:w-60">{o.address}</li>
-                    <li className="md:w-32">Tel : {o.tel}</li>
-                    <li>Fax : {o.fax}</li>
+                <div key={o.label} className="flex flex-col gap-1 md:flex-row md:gap-8">
+                  <span className="w-16 shrink-0 font-bold text-brand-sky">{o.label}</span>
+                  <ul className="flex flex-col gap-1 text-neutral-400 md:flex-row md:gap-6">
+                    <li className="md:w-64">{o.address}</li>
+                    <li>Tel {o.tel}</li>
+                    <li>Fax {o.fax}</li>
                   </ul>
                 </div>
               ))}
             </div>
 
-            {/* Family site */}
-            <div className="w-full md:w-56">
+            {/* 관련 사이트 */}
+            <div className="w-full md:w-52">
               <select
-                aria-label="Family site"
-                className="w-full rounded border border-zinc-600 bg-transparent px-4 py-2.5 text-sm font-bold text-neutral-300"
+                aria-label="관련 사이트"
+                className="w-full rounded border border-gray-600 bg-transparent px-4 py-2.5
+                           text-sm font-bold text-neutral-300 cursor-pointer"
                 defaultValue=""
-                onChange={(e) => {
-                  if (e.target.value) window.open(e.target.value, '_blank')
-                }}
+                onChange={(e) => { if (e.target.value) window.open(e.target.value, '_blank') }}
               >
-                <option value="" disabled>
-                  Family site
-                </option>
+                <option value="" disabled>관련 사이트</option>
                 {company.familySites.map((f) => (
-                  <option key={f.name} value={f.url} className="text-black">
-                    {f.name}
-                  </option>
+                  <option key={f.name} value={f.url} className="text-black">{f.name}</option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* 정책 링크 + 카피라이트 */}
-          <div className="flex flex-col justify-between gap-4 border-t border-neutral-800 pt-4 text-sm md:flex-row md:items-center">
-            <ul className="flex">
+          {/* 정책 링크 + 카피 */}
+          <div className="mt-8 flex flex-col justify-between gap-4
+                          border-t border-gray-700 pt-6 text-sm
+                          md:flex-row md:items-center">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {company.footerLinks.map((l) => (
                 <li key={l.label}>
                   <Link
                     to={l.to}
-                    className={[
-                      'px-6 first:pl-0',
+                    className={
                       l.strong
-                        ? 'font-black text-white'
-                        : 'font-medium text-neutral-400 hover:text-white',
-                    ].join(' ')}
+                        ? 'font-bold text-white hover:text-brand-sky'
+                        : 'text-neutral-400 hover:text-white transition-colors'
+                    }
                   >
                     {l.label}
                   </Link>
                 </li>
               ))}
             </ul>
-            <p className="text-zinc-500">{company.copyright}</p>
+            <p className="text-neutral-500 text-xs">{company.copyright}</p>
           </div>
         </div>
       </div>

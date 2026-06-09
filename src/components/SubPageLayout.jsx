@@ -1,38 +1,33 @@
 import { NavLink } from 'react-router-dom'
-import Placeholder from './Placeholder'
 
-// ============================================================
-// 서브페이지 공통 레이아웃
-//  - 상단 sticky 탭 네비 (대카테고리 제목 + 빵부스러기 + 탭 메뉴)
-//  - 페이지헤드 이미지(플레이스홀더)
-//  - 본문(children)
-// ============================================================
 export default function SubPageLayout({ sectionTitle, tabs, headLabel, children }) {
   return (
     <div>
-      {/* sticky 탭 네비 */}
-      <div className="sticky top-20 z-30 bg-white shadow-sm">
-        <div className="mx-auto max-w-container px-4 pt-12 md:px-10 lg:px-20">
+      {/* Sticky 탭 네비 */}
+      <div className="sticky top-20 z-30 bg-white dark:bg-gray-950 shadow-sm
+                      border-b border-gray-100 dark:border-gray-800 transition-colors">
+        <div className="mx-auto max-w-container section-x pt-10">
           <div className="flex flex-col-reverse justify-between md:flex-row">
-            <h2 className="mb-6 text-4xl font-bold leading-none text-stone-500 md:mb-12 md:text-5xl">
+            <h2 className="mb-6 text-3xl font-bold leading-none text-brand-navy dark:text-brand-sky
+                           md:mb-10 md:text-4xl">
               {sectionTitle}
             </h2>
-            <p className="mb-4 text-sm font-medium text-zinc-500 md:mb-0">
-              홈<span className="ml-3 border-l border-zinc-300 pl-3">{sectionTitle}</span>
+            <p className="mb-3 text-sm font-medium text-neutral-400 dark:text-neutral-500 md:mb-0">
+              홈 <span className="mx-2 text-neutral-300">/</span> {sectionTitle}
             </p>
           </div>
 
-          <ul className="flex w-full justify-around overflow-x-auto font-bold">
+          <ul className="flex w-full overflow-x-auto font-semibold">
             {tabs.map((t) => (
               <li key={t.to} className="shrink-0">
                 <NavLink
                   to={t.to}
                   className={({ isActive }) =>
                     [
-                      'block whitespace-nowrap border-b-2 px-4 py-5 transition md:px-10 md:py-7',
+                      'block whitespace-nowrap border-b-2 px-4 py-4 text-sm transition md:px-8 md:py-5 md:text-base',
                       isActive
-                        ? 'border-brand text-brand'
-                        : 'border-transparent text-neutral-700 hover:text-brand',
+                        ? 'border-brand-royal text-brand-royal dark:border-brand-sky dark:text-brand-sky'
+                        : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-brand-royal dark:hover:text-brand-sky',
                     ].join(' ')
                   }
                 >
@@ -44,11 +39,21 @@ export default function SubPageLayout({ sectionTitle, tabs, headLabel, children 
         </div>
       </div>
 
-      {/* 페이지헤드 이미지 */}
-      <Placeholder label={`PAGE HEAD — ${headLabel}`} ratio="32/9" />
+      {/* 페이지 헤더 */}
+      <div className="w-full bg-gradient-to-br from-brand-navy to-brand-royal dark:from-gray-900 dark:to-brand-navy
+                      flex items-center justify-center" style={{ aspectRatio: '32/9' }}>
+        <div className="text-center">
+          <p className="text-sm font-semibold tracking-widest text-brand-sky/80 uppercase mb-2">
+            {headLabel}
+          </p>
+          <p className="text-3xl font-bold text-white md:text-5xl">{sectionTitle}</p>
+        </div>
+      </div>
 
       {/* 본문 */}
-      <div className="border-b border-neutral-200 py-16 md:py-24">{children}</div>
+      <div className="border-b border-neutral-200 dark:border-gray-800 py-16 md:py-24 transition-colors">
+        {children}
+      </div>
     </div>
   )
 }

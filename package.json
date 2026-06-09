@@ -1,9 +1,9 @@
 {
-  "name": "rest03",
+  "name": "edufocus",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
-  "description": "회사 사이트 템플릿 (건설사) - React + Vite + Tailwind",
+  "description": "에듀포커스 — 취약점 분석 기반 어학·자격증·교과목 집중 학습 플랫폼",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

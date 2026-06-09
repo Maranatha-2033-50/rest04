@@ -3,41 +3,45 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
   body {
-    @apply font-sans text-neutral-900 antialiased;
+    @apply font-sans text-neutral-900 antialiased
+           bg-white dark:bg-gray-950 dark:text-neutral-100
+           transition-colors duration-300;
   }
 }
 
 @layer components {
-  /* 우측 화살표가 붙은 둥근 버튼 (소스의 btn-arrow 스타일) */
-  .btn-pill {
-    @apply inline-flex items-center gap-3 rounded-full bg-neutral-100 py-4 pl-6 pr-12 font-bold transition hover:bg-neutral-200;
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-full
+           bg-brand-royal text-white px-6 py-2.5 text-sm font-semibold
+           hover:bg-brand-navy transition-colors;
   }
-  .btn-pill::after {
-    content: '→';
-    @apply absolute right-5 text-neutral-500;
+  .btn-outline {
+    @apply inline-flex items-center gap-2 rounded-full
+           border border-brand-royal text-brand-royal px-6 py-2.5 text-sm font-semibold
+           hover:bg-brand-royal hover:text-white transition-colors
+           dark:border-brand-sky dark:text-brand-sky
+           dark:hover:bg-brand-sky dark:hover:text-gray-950;
   }
-
-  /* 섹션 공통 좌우 여백 */
   .section-x {
-    @apply px-4 md:px-10 lg:px-24 xl:px-40;
+    @apply px-4 sm:px-8 md:px-12 lg:px-24 xl:px-40;
+  }
+  .card {
+    @apply bg-white dark:bg-gray-900 rounded-2xl shadow-sm
+           border border-gray-100 dark:border-gray-800;
+  }
+  .badge {
+    @apply inline-block rounded-full
+           bg-brand-light dark:bg-brand-navy/40
+           text-brand-royal dark:text-brand-sky
+           text-xs font-semibold px-3 py-1;
   }
 }
 
-/* 히어로 슬라이더 페이드 */
 @keyframes heroFade {
-  0%,
-  45% {
-    opacity: 1;
-  }
-  50%,
-  95% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  0%   { opacity: 0; transform: scale(1.04); }
+  8%   { opacity: 1; transform: scale(1); }
+  88%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
 }

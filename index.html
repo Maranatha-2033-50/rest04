@@ -4,12 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="건설사 회사 사이트 템플릿 - React 기반" />
+    <meta name="description" content="에듀포커스 — 취약점 분석 기반 어학·자격증·교과목 집중 학습 플랫폼" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
     />
-    <title>CHINHUNG · 회사 사이트 템플릿</title>
+    <title>에듀포커스 · 취약점 집중 학습 플랫폼</title>
+    <script>
+      (function () {
+        const saved = localStorage.getItem('theme')
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (saved === 'dark' || (!saved && prefersDark)) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

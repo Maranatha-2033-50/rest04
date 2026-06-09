@@ -5,8 +5,11 @@ import ScrollToTop from './components/ScrollToTop'
 import ScrollToTopButton from './components/ScrollToTopButton'
 
 import Home from './pages/Home'
-import Business from './pages/Business'
-import Sustainability from './pages/Sustainability'
+import Languages from './pages/Languages'
+import Certifications from './pages/Certifications'
+import Subjects from './pages/Subjects'
+import Videos from './pages/Videos'
+import AIApp from './pages/AIApp'
 import About from './pages/About'
 import SimplePage from './pages/SimplePage'
 
@@ -19,27 +22,32 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
 
+          {/* 어학 */}
+          <Route path="/languages" element={<Navigate to="/languages/ielts" replace />} />
+          <Route path="/languages/:tab" element={<Languages />} />
+
+          {/* 자격증 */}
+          <Route path="/certifications" element={<Navigate to="/certifications/computer" replace />} />
+          <Route path="/certifications/:tab" element={<Certifications />} />
+
+          {/* 교과목 */}
+          <Route path="/subjects" element={<Navigate to="/subjects/english" replace />} />
+          <Route path="/subjects/:tab" element={<Subjects />} />
+
+          {/* 학습 동영상 */}
+          <Route path="/videos" element={<Navigate to="/videos/ielts" replace />} />
+          <Route path="/videos/:topic" element={<Videos />} />
+
+          {/* AI 학습앱 */}
+          <Route path="/ai-app" element={<AIApp />} />
+
           {/* 회사소개 */}
-          <Route path="/about" element={<Navigate to="/about/greetings" replace />} />
+          <Route path="/about" element={<Navigate to="/about/greeting" replace />} />
           <Route path="/about/:tab" element={<About />} />
 
-          {/* 사업소개 — :category 로 탭 전환 */}
-          <Route path="/business" element={<Navigate to="/business/housing" replace />} />
-          <Route path="/business/:category" element={<Business />} />
-
-          {/* 지속가능경영 */}
-          <Route
-            path="/sustainability"
-            element={<Navigate to="/sustainability/ethical" replace />}
-          />
-          <Route path="/sustainability/:tab" element={<Sustainability />} />
-
-          {/* 기타 단순 페이지 */}
-          <Route path="/investment" element={<SimplePage title="투자정보" />} />
+          {/* 단순 페이지 */}
           <Route path="/support" element={<SimplePage title="고객센터" />} />
-          <Route path="/recruit" element={<SimplePage title="인재채용" />} />
-          <Route path="/report" element={<SimplePage title="제보센터" />} />
-          <Route path="/legal" element={<SimplePage title="법적고지" />} />
+          <Route path="/terms" element={<SimplePage title="이용약관" />} />
           <Route path="/privacy" element={<SimplePage title="개인정보처리방침" />} />
 
           <Route path="*" element={<SimplePage title="페이지를 찾을 수 없습니다" />} />

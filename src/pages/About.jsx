@@ -1,100 +1,145 @@
-import { useParams, Navigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import SubPageLayout from '../components/SubPageLayout'
-import Placeholder from '../components/Placeholder'
+import { company } from '../data/site'
 
 const tabs = [
-  { label: 'CEO 인사말', to: '/about/greetings' },
-  { label: '비전/가치', to: '/about/vision' },
+  { label: '대표 인사말', to: '/about/greeting' },
+  { label: '서비스 소개', to: '/about/services' },
   { label: '연혁', to: '/about/history' },
-  { label: '브랜드소개', to: '/about/brand' },
 ]
 
-const pages = {
-  greetings: { headLabel: 'Greetings', en: 'CEO Message', title: 'CEO 인사말' },
-  vision: { headLabel: 'Vision', en: 'Vision & Value', title: '비전/가치' },
-  history: { headLabel: 'History', en: 'History', title: '연혁' },
-  brand: { headLabel: 'Brand', en: 'Brand', title: '브랜드소개' },
+function Greeting() {
+  return (
+    <div className="mx-auto max-w-container section-x">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-5">
+        <div className="lg:col-span-2">
+          <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-brand-navy to-brand-royal
+                          dark:from-gray-800 dark:to-brand-navy
+                          flex items-center justify-center">
+            <div className="text-center text-white">
+              <div className="text-6xl mb-4">👤</div>
+              <p className="text-sm opacity-70">대표 사진</p>
+            </div>
+          </div>
+        </div>
+        <div className="lg:col-span-3">
+          <span className="badge mb-4">대표 인사말</span>
+          <h3 className="mb-6 text-3xl font-extrabold text-brand-navy dark:text-white">
+            취약점을 알면,<br />합격이 보입니다
+          </h3>
+          <div className="space-y-5 text-base leading-8 text-neutral-600 dark:text-neutral-400">
+            <p>에듀포커스를 방문해 주신 여러분께 진심으로 감사드립니다.</p>
+            <p>
+              저는 오랜 교육 현장 경험을 통해 한 가지 사실을 깨달았습니다.
+              학습자가 실패하는 이유는 노력이 부족해서가 아니라,
+              자신의 취약점을 정확히 모르기 때문이라는 것입니다.
+            </p>
+            <p>
+              에듀포커스는 AI 기반 취약점 분석 기술로 각 학습자가 어디에서 막히는지를 정밀하게 파악하고,
+              그 취약점을 집중적으로 보완할 수 있는 맞춤 학습 루틴을 제공합니다.
+            </p>
+            <p>
+              IELTS, DELF, 컴퓨터활용능력, 정보처리기사, 한국사능력검정 등
+              주요 어학·자격증 시험에서 여러분의 합격을 위해 에듀포커스가 함께하겠습니다.
+            </p>
+          </div>
+          <div className="mt-10 border-t border-gray-100 dark:border-gray-800 pt-8">
+            <p className="font-bold text-brand-navy dark:text-white text-lg">{company.nameKo} 대표</p>
+            <p className="text-neutral-500 dark:text-neutral-400 mt-1">{company.fullName}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-// 연혁 데모 데이터
-const history = [
-  { year: '2026', events: ['홈페이지 리뉴얼 오픈', 'ISO 9001 인증 갱신'] },
-  { year: '2020', events: ['해외사업 본격 진출', '플랜트사업부 신설'] },
-  { year: '2010', events: ['충남도청신도시 지하차도 건설 수주'] },
-  { year: '1998', events: ['ISO 9001 품질경영시스템 최초 인증'] },
-]
+function Services() {
+  const services = [
+    {
+      icon: '🌐', title: '어학 — IELTS · DELF',
+      desc: 'IELTS와 DELF A1~C2 전 레벨에 걸쳐 영역별 취약점 분석과 집중 학습 루틴을 제공합니다.',
+      tags: ['IELTS', 'DELF A1-A2', 'DELF B1-B2', 'DELF C1-C2'],
+    },
+    {
+      icon: '📋', title: '자격증 집중 학습',
+      desc: '컴퓨터활용능력, 정보처리기사, 한국사능력검정 합격을 위한 단계별 취약점 집중 학습을 제공합니다.',
+      tags: ['컴활 1·2급', '정보처리기사', '한능검 심화·기본'],
+    },
+    {
+      icon: '📚', title: '교과목 과외',
+      desc: '영어·수학·과학·국어 핵심 교과목에서 취약 단원을 집중 보완하는 맞춤 과외 서비스입니다.',
+      tags: ['영어', '수학', '과학', '국어'],
+    },
+    {
+      icon: '🤖', title: 'AI 취약점 분석 앱',
+      desc: '학습 데이터를 AI로 분석해 취약점 리포트·맞춤 루틴·집중 문제를 자동 제공하는 앱입니다.',
+      tags: ['취약점 분석', '맞춤 루틴', '집중 문제'],
+    },
+  ]
 
-function Greetings() {
   return (
-    <div className="flex flex-col gap-12 md:flex-row md:gap-16">
-      <div className="w-full md:w-2/5">
-        <Placeholder label="CEO PHOTO" ratio="4/5" rounded />
+    <div className="mx-auto max-w-container section-x">
+      <div className="mb-12 text-center">
+        <span className="badge mb-3">서비스 소개</span>
+        <h3 className="text-3xl font-extrabold text-brand-navy dark:text-white">에듀포커스 핵심 서비스</h3>
       </div>
-      <div className="flex-1">
-        <p className="mb-8 text-3xl font-bold leading-snug text-brand md:text-4xl">
-          신뢰와 기술로
-          <br />
-          내일의 가치를 짓습니다.
-        </p>
-        <div className="space-y-5 text-lg font-medium leading-8 text-neutral-700">
-          <p>
-            안녕하십니까. 진흥기업 홈페이지를 찾아주신 여러분께 진심으로 감사드립니다.
-            저희는 반세기가 넘는 시간 동안 주택, 건축, 토목, 플랜트 전 영역에서 축적한 기술력과
-            노하우로 고객의 신뢰에 보답해 왔습니다.
-          </p>
-          <p>
-            앞으로도 사람이 머무는 공간과 그 공간을 둘러싼 환경까지 함께 설계하며, 도시와 자연이
-            균형을 이루는 지속 가능한 미래를 만들어가겠습니다. 변함없는 관심과 성원을 부탁드립니다.
-          </p>
-          <p className="pt-4 font-bold text-neutral-900">진흥기업 대표이사</p>
-        </div>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {services.map((s) => (
+          <div key={s.title} className="card p-8">
+            <div className="text-4xl mb-4">{s.icon}</div>
+            <h4 className="mb-3 text-xl font-bold text-brand-navy dark:text-white">{s.title}</h4>
+            <p className="mb-5 text-sm leading-7 text-neutral-600 dark:text-neutral-400">{s.desc}</p>
+            <div className="flex flex-wrap gap-2">
+              {s.tags.map((t) => (
+                <span key={t} className="badge text-xs">{t}</span>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
 function History() {
+  const milestones = [
+    { year: '2026', event: 'AI 학습앱 v2.0 출시 — 취약점 리포트 고도화' },
+    { year: '2025', event: 'DELF C1·C2 과정 및 정보처리기사 집중 과정 런칭' },
+    { year: '2024', event: 'AI 기반 취약점 분석 엔진 자체 개발 · 특허 출원' },
+    { year: '2023', event: '에듀포커스 설립 · IELTS·컴활·한능검 서비스 시작' },
+  ]
+
   return (
-    <div className="flex flex-col gap-10">
-      {history.map((h) => (
-        <div
-          key={h.year}
-          className="flex flex-col gap-4 border-b border-neutral-200 pb-8 md:flex-row md:gap-16"
-        >
-          <p className="text-4xl font-bold text-brand md:w-40">{h.year}</p>
-          <ul className="flex flex-1 flex-col gap-2 text-lg font-medium text-neutral-700">
-            {h.events.map((e, i) => (
-              <li key={i}>· {e}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
+    <div className="mx-auto max-w-container section-x">
+      <div className="mb-12 text-center">
+        <span className="badge mb-3">연혁</span>
+        <h3 className="text-3xl font-extrabold text-brand-navy dark:text-white">에듀포커스의 발자취</h3>
+      </div>
+      <div className="relative border-l-2 border-brand-royal/30 dark:border-brand-sky/30 pl-10 space-y-10">
+        {milestones.map((m) => (
+          <div key={m.year} className="relative">
+            <div className="absolute -left-[2.85rem] flex h-8 w-8 items-center justify-center rounded-full
+                            bg-brand-royal dark:bg-brand-sky text-white dark:text-gray-950
+                            text-xs font-bold shadow">
+              {m.year.slice(2)}
+            </div>
+            <p className="text-sm font-bold text-brand-royal dark:text-brand-sky mb-1">{m.year}</p>
+            <p className="text-neutral-700 dark:text-neutral-300">{m.event}</p>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
 export default function About() {
   const { tab } = useParams()
-  const meta = pages[tab]
-  if (!meta) return <Navigate to="/about/greetings" replace />
+  const content = { greeting: <Greeting />, services: <Services />, history: <History /> }
+  const current = content[tab] ?? <Greeting />
 
   return (
-    <SubPageLayout sectionTitle="회사소개" headLabel={meta.headLabel} tabs={tabs}>
-      <div className="mx-auto max-w-container px-4 md:px-10 lg:px-40">
-        <p className="mb-16 text-5xl font-semibold leading-none text-brand md:text-7xl">
-          {meta.en}
-        </p>
-        {tab === 'greetings' && <Greetings />}
-        {tab === 'history' && <History />}
-        {(tab === 'vision' || tab === 'brand') && (
-          <>
-            <p className="mb-10 text-lg font-medium leading-8 text-neutral-700">
-              {meta.title} 콘텐츠가 들어갈 영역입니다. 실제 운영 시 내용으로 교체하세요.
-            </p>
-            <Placeholder label={`${meta.title} CONTENT`} ratio="21/9" rounded />
-          </>
-        )}
-      </div>
+    <SubPageLayout sectionTitle="회사소개" tabs={tabs} headLabel="About">
+      {current}
     </SubPageLayout>
   )
 }
