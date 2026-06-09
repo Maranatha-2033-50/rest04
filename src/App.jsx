@@ -12,6 +12,7 @@ import Videos from './pages/Videos'
 import AIApp from './pages/AIApp'
 import About from './pages/About'
 import SimplePage from './pages/SimplePage'
+import Support from './pages/Support'
 
 export default function App() {
   return (
@@ -45,10 +46,12 @@ export default function App() {
           <Route path="/about" element={<Navigate to="/about/greeting" replace />} />
           <Route path="/about/:tab" element={<About />} />
 
-          {/* 단순 페이지 */}
-          <Route path="/support" element={<SimplePage title="고객센터" />} />
-          <Route path="/terms" element={<SimplePage title="이용약관" />} />
-          <Route path="/privacy" element={<SimplePage title="개인정보처리방침" />} />
+          {/* 고객센터 */}
+          <Route path="/support" element={<Support />} />
+
+          {/* 약관 / 정책 */}
+          <Route path="/terms" element={<SimplePage title="이용약관" contentKey="terms" />} />
+          <Route path="/privacy" element={<SimplePage title="개인정보처리방침" contentKey="privacy" />} />
 
           <Route path="*" element={<SimplePage title="페이지를 찾을 수 없습니다" />} />
         </Routes>

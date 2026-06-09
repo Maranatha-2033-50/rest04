@@ -437,6 +437,166 @@ export const aboutHistory = [
   { year: '2023', event: '에듀포커스 설립 · IELTS·컴활·한능검 서비스 시작' },
 ]
 
+// ── 이용약관 ─────────────────────────────────────────────────
+// 구조: { ko: { lastUpdated, sections[] }, en: { ... } }
+// 다국어 전환 시 컴포넌트에서 lang 파라미터로 ko/en 선택
+export const termsContent = {
+  ko: {
+    lastUpdated: '2026년 1월 1일',
+    sections: [
+      {
+        heading: '제1조 (목적)',
+        body: '이 약관은 에듀포커스(이하 "회사")가 제공하는 온라인 교육 서비스(이하 "서비스")의 이용 조건 및 절차, 회사와 이용자의 권리·의무 및 책임 사항을 규정함을 목적으로 합니다.',
+      },
+      {
+        heading: '제2조 (정의)',
+        body: '"서비스"란 회사가 제공하는 AI 기반 취약점 분석, 학습 루틴 설계, 학습 동영상, 교과목 과외 등 일체의 학습 지원 서비스를 의미합니다. "이용자"란 본 약관에 동의하고 회사가 제공하는 서비스를 이용하는 자를 의미합니다.',
+      },
+      {
+        heading: '제3조 (서비스의 제공 및 변경)',
+        body: '회사는 연중무휴 24시간 서비스 제공을 원칙으로 하나, 시스템 점검·운영상의 사유로 서비스를 일시 중단할 수 있습니다. 서비스 내용이나 구성을 변경하는 경우 사전에 공지하며, 이용자는 변경 내용에 동의하지 않을 경우 서비스 이용을 중단할 수 있습니다.',
+      },
+      {
+        heading: '제4조 (이용계약의 체결)',
+        body: '이용계약은 이용자가 회원 가입 신청을 하고 회사가 이를 승낙함으로써 성립합니다. 회사는 다음 각 호에 해당하는 경우 신청을 거절할 수 있습니다. ① 허위 정보를 기재한 경우 ② 타인의 명의를 도용한 경우 ③ 기타 이용 신청 요건을 충족하지 못한 경우.',
+      },
+      {
+        heading: '제5조 (이용자의 의무)',
+        body: '이용자는 서비스 이용 시 다음 행위를 하여서는 안 됩니다. ① 타인의 개인정보 또는 결제 정보 도용 ② 서비스 내 콘텐츠의 무단 복제·배포 ③ 회사 또는 제3자의 지식재산권 침해 ④ 서비스의 정상적인 운영을 방해하는 행위.',
+      },
+      {
+        heading: '제6조 (서비스 이용 제한)',
+        body: '회사는 이용자가 본 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해하는 경우, 사전 통보 없이 서비스 이용을 제한하거나 이용계약을 해지할 수 있습니다.',
+      },
+      {
+        heading: '제7조 (손해배상)',
+        body: '회사의 귀책사유로 이용자에게 손해가 발생한 경우 회사는 관련 법령에 따라 배상 책임을 집니다. 단, 이용자의 귀책사유로 인한 손해에 대해서는 이용자가 책임을 부담합니다.',
+      },
+      {
+        heading: '제8조 (면책조항)',
+        body: '회사는 천재지변·전쟁 등 불가항력 사유로 서비스를 제공하지 못한 경우 면책됩니다. 이용자가 직접 게재한 정보의 신뢰성·정확성에 관해 회사는 별도의 책임을 지지 않습니다.',
+      },
+      {
+        heading: '부칙',
+        body: '이 약관은 2026년 1월 1일부터 시행합니다.',
+      },
+    ],
+  },
+  en: {
+    lastUpdated: 'January 1, 2026',
+    sections: [
+      {
+        heading: 'Section 1: Purpose',
+        body: 'These Terms of Service govern your use of EDUFOCUS educational services and platform. By accessing or using our services, you agree to be bound by these terms and all applicable laws and regulations.',
+      },
+      {
+        heading: 'Section 2: Services',
+        body: 'EDUFOCUS provides AI-powered learning analytics, customized study routines, video-based learning content, and subject tutoring services. The company reserves the right to modify or discontinue any service feature with prior notice.',
+      },
+      {
+        heading: 'Section 3: User Account',
+        body: 'Users must provide accurate and complete information when registering. You are responsible for maintaining the confidentiality of your account credentials. EDUFOCUS reserves the right to suspend accounts found in violation of these terms.',
+      },
+      {
+        heading: 'Section 4: User Obligations',
+        body: 'Users agree not to: misuse or misrepresent personal information; reproduce or distribute platform content without authorization; infringe upon intellectual property rights; or engage in any activity that disrupts normal service operations.',
+      },
+      {
+        heading: 'Section 5: Limitation of Liability',
+        body: 'EDUFOCUS shall not be liable for indirect, incidental, or consequential damages arising from service use. In no event shall our liability exceed the fees paid by the user in the preceding three months.',
+      },
+      {
+        heading: 'Section 6: Governing Law',
+        body: 'These terms shall be governed by and construed in accordance with applicable laws. Any disputes arising from these terms will be resolved through appropriate legal channels in the relevant jurisdiction.',
+      },
+      {
+        heading: 'Addendum',
+        body: 'These Terms of Service are effective as of January 1, 2026.',
+      },
+    ],
+  },
+}
+
+// ── 개인정보처리방침 ──────────────────────────────────────────
+// 구조: { ko: { lastUpdated, sections[] }, en: { ... } }
+// EN 버전: PIPEDA(캐나다) 및 글로벌 서비스 표준 기반 플레이스홀더
+export const privacyContent = {
+  ko: {
+    lastUpdated: '2026년 1월 1일',
+    sections: [
+      {
+        heading: '제1조 (수집하는 개인정보의 항목)',
+        body: '회사는 서비스 제공을 위해 다음의 개인정보를 수집합니다. [필수] 이름, 이메일 주소, 학습 진도 데이터. [선택] 연락처, 학습 목표, 응시 예정 시험 정보. 서비스 이용 과정에서 IP 주소, 쿠키, 접속 로그 등이 자동으로 수집될 수 있습니다.',
+      },
+      {
+        heading: '제2조 (개인정보의 수집 및 이용 목적)',
+        body: '수집된 개인정보는 다음 목적으로만 활용됩니다. ① 서비스 제공 및 AI 취약점 분석 기능 운영 ② 맞춤 학습 루틴 설계 및 진도 리포트 생성 ③ 공지사항 전달 및 고객 지원 ④ 서비스 품질 개선을 위한 통계 분석 (개인 식별 불가 형태).',
+      },
+      {
+        heading: '제3조 (개인정보의 보유 및 이용 기간)',
+        body: '회사는 원칙적으로 개인정보의 수집 및 이용 목적이 달성되면 지체 없이 파기합니다. 단, 관련 법령(전자상거래 등에서의 소비자보호에 관한 법률 등)에 의해 보관이 필요한 정보는 해당 규정에 따라 보유합니다.',
+      },
+      {
+        heading: '제4조 (개인정보의 파기 절차 및 방법)',
+        body: '이용 목적이 달성된 후 별도 데이터베이스로 이관하여 보관하다 법령에 따라 파기합니다. 전자적 파일은 복구 불가능한 기술적 방법으로 완전 삭제하며, 종이 문서는 분쇄 또는 소각하여 파기합니다.',
+      },
+      {
+        heading: '제5조 (이용자 및 법정대리인의 권리와 행사 방법)',
+        body: '이용자는 언제든지 자신의 개인정보를 열람·수정·삭제하고 처리 정지를 요청할 수 있습니다. 만 14세 미만 아동의 경우 법정대리인이 이 권리를 행사할 수 있습니다. 요청은 고객센터(문의하기)를 통해 접수됩니다.',
+      },
+      {
+        heading: '제6조 (개인정보의 안전성 확보 조치)',
+        body: '회사는 개인정보보호를 위해 다음 조치를 시행합니다. ① SSL 암호화 전송 적용 ② 개인정보 접근 권한 최소화 및 관리 ③ 정기적인 보안 취약점 점검 및 업데이트.',
+      },
+      {
+        heading: '제7조 (개인정보 보호책임자)',
+        body: '회사는 개인정보 처리에 관한 업무를 총괄하는 개인정보 보호책임자를 지정하고 있습니다. 개인정보 관련 문의·불만·피해 구제는 고객센터(문의하기 페이지)를 통해 접수할 수 있습니다.',
+      },
+      {
+        heading: '부칙',
+        body: '이 방침은 2026년 1월 1일부터 시행합니다. 방침이 변경될 경우 시행 7일 전에 공지사항을 통해 고지합니다.',
+      },
+    ],
+  },
+  en: {
+    lastUpdated: 'January 1, 2026',
+    sections: [
+      {
+        heading: 'Section 1: Collection of Personal Information',
+        body: 'EDUFOCUS collects personal information including name, email address, and learning analytics data to provide our AI-powered educational services. This Privacy Policy complies with global and Canadian privacy standards, including the Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable international data protection regulations.',
+      },
+      {
+        heading: 'Section 2: Purpose of Collection and Use',
+        body: 'We collect and use personal information solely to: provide personalized AI-driven learning analytics and weak-point diagnosis; design customized study routines; generate learning progress reports; deliver service announcements and customer support; and improve service quality through anonymized statistical analysis.',
+      },
+      {
+        heading: 'Section 3: Retention and Disposal',
+        body: 'Personal information is retained only as long as necessary to fulfill the purposes for which it was collected, or as required by applicable law. Upon request or account deletion, data will be securely disposed of using industry-standard irreversible deletion methods.',
+      },
+      {
+        heading: 'Section 4: User Rights',
+        body: 'Under PIPEDA and applicable global privacy standards, you have the right to: access your personal information held by EDUFOCUS; correct inaccurate or incomplete information; withdraw consent for non-essential data processing; and request deletion of your personal data. Requests can be submitted through our Support page and will be addressed within 10 business days.',
+      },
+      {
+        heading: 'Section 5: Security Measures',
+        body: 'EDUFOCUS employs industry-standard security measures to protect your personal information, including SSL-encrypted data transmission, role-based access controls, and regular security audits. We are committed to maintaining the confidentiality and integrity of all data entrusted to us.',
+      },
+      {
+        heading: 'Section 6: Cross-Border Data Transfers',
+        body: 'If personal information is transferred outside your jurisdiction, EDUFOCUS ensures that appropriate safeguards are in place, consistent with PIPEDA requirements and applicable international privacy frameworks, to protect your information to a standard equivalent to that in your home jurisdiction.',
+      },
+      {
+        heading: 'Section 7: Privacy Officer',
+        body: 'EDUFOCUS has designated a Privacy Officer responsible for overseeing compliance with this policy and applicable privacy legislation. For privacy-related inquiries, corrections, or complaints, please contact us via our Support page. We are committed to resolving privacy concerns promptly and transparently.',
+      },
+      {
+        heading: 'Addendum',
+        body: 'This Privacy Policy is effective as of January 1, 2026. We will notify users of any material changes at least 7 days before they take effect.',
+      },
+    ],
+  },
+}
+
 // ── 유튜브 영상 ──────────────────────────────────────────────
 // id: 실제 YouTube 영상 ID로 교체 (PLACEHOLDER_주제_번호 형식)
 export const videoTopics = [
