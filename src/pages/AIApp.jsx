@@ -62,15 +62,20 @@ function HeroSection() {
             IELTS·DELF·자격증 목표 점수 달성까지 최단 경로의 학습 루틴을 자동으로 설계합니다.
           </p>
           <div id="download" className="flex flex-wrap gap-4">
-            <a href={`https://apps.apple.com`} target="_blank" rel="noopener noreferrer"
+            <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-full bg-white text-brand-navy
                          px-8 py-3.5 text-base font-bold shadow hover:shadow-lg transition">
               <span>🍎</span> iOS 다운로드
             </a>
-            <a href={`https://play.google.com`} target="_blank" rel="noopener noreferrer"
+            <a href="https://play.google.com" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-full bg-white/20 text-white
                          border border-white/30 px-8 py-3.5 text-base font-bold hover:bg-white/30 transition">
               <span>🤖</span> Android 다운로드
+            </a>
+            <a href="https://study-mate-nine-phi.vercel.app" target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 rounded-full bg-brand-amber text-white
+                         px-8 py-3.5 text-base font-bold shadow-lg hover:brightness-110 transition">
+              <span>🚀</span> Study Mate 앱 바로가기
             </a>
           </div>
         </div>

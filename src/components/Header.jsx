@@ -21,7 +21,7 @@ function MoonIcon() {
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [hovered, setHovered] = useState(null)
+  const [hoveredIdx, setHoveredIdx] = useState(null)
   const [dark, setDark] = useState(() =>
     document.documentElement.classList.contains('dark')
   )
@@ -38,11 +38,9 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full">
-      <nav
-        className="bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-800 transition-colors"
-        onMouseLeave={() => setHovered(null)}
-      >
+      <nav className="bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-800 transition-colors">
         <div className="mx-auto flex h-20 max-w-container items-center justify-between px-4 md:px-10 lg:px-20">
+
           {/* 로고 */}
           <Link
             to="/"
@@ -54,13 +52,14 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* 데스크탑 메뉴 */}
+          {/* 데스크탑 메뉴 — 각 항목이 자체 드롭다운을 독립적으로 관리 */}
           <ul className="hidden items-stretch lg:flex">
-            {nav.map((item) => (
+            {nav.map((item, idx) => (
               <li
                 key={item.label}
-                className="group flex items-center"
-                onMouseEnter={() => setHovered(item.label)}
+                className="relative flex items-center"
+                onMouseEnter={() => setHoveredIdx(idx)}
+                onMouseLeave={() => setHoveredIdx(null)}
               >
                 <NavLink
                   to={item.to}
@@ -75,13 +74,33 @@ export default function Header() {
                 >
                   {item.label}
                 </NavLink>
+
+                {/* 개별 드롭다운 — hoveredIdx === idx 일 때만 표시 */}
+                {hoveredIdx === idx && item.children?.length > 0 && (
+                  <ul className="absolute left-1/2 top-full z-50 min-w-[160px] -translate-x-1/2
+                                  rounded-xl border border-gray-100 dark:border-gray-800
+                                  bg-white dark:bg-gray-950 shadow-xl py-2">
+                    {item.children.map((c) => (
+                      <li key={c.label + c.to}>
+                        <Link
+                          to={c.to}
+                          onClick={() => setHoveredIdx(null)}
+                          className="block px-5 py-2.5 text-sm text-neutral-600 dark:text-neutral-400
+                                     whitespace-nowrap hover:text-brand-royal dark:hover:text-brand-sky
+                                     hover:bg-brand-light dark:hover:bg-gray-800 transition-colors"
+                        >
+                          {c.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
 
           {/* 우측: 다크모드 토글 + 햄버거 */}
           <div className="flex items-center gap-3">
-            {/* 다크모드 토글 */}
             <button
               type="button"
               aria-label={dark ? '라이트 모드로 전환' : '다크 모드로 전환'}
@@ -94,7 +113,6 @@ export default function Header() {
               {dark ? <SunIcon /> : <MoonIcon />}
             </button>
 
-            {/* 햄버거 (모바일) */}
             <button
               type="button"
               aria-label="메뉴 열기"
@@ -105,39 +123,6 @@ export default function Header() {
               <span className="h-0.5 w-6 bg-neutral-800 dark:bg-neutral-200" />
               <span className="h-0.5 w-6 bg-neutral-800 dark:bg-neutral-200" />
             </button>
-          </div>
-        </div>
-
-        {/* 데스크탑 서브메뉴 드롭다운 */}
-        <div
-          className={[
-            'hidden overflow-hidden border-b bg-white dark:bg-gray-950 transition-all duration-200 lg:block',
-            hovered
-              ? 'max-h-60 opacity-100 border-gray-100 dark:border-gray-800'
-              : 'max-h-0 border-b-0 opacity-0',
-          ].join(' ')}
-        >
-          <div className="mx-auto flex max-w-container justify-end px-20">
-            {nav.map((item) => (
-              <ul
-                key={item.label}
-                className="flex w-44 flex-col gap-3 py-6"
-                onMouseEnter={() => setHovered(item.label)}
-              >
-                {hovered === item.label &&
-                  item.children.map((c) => (
-                    <li key={c.label + c.to}>
-                      <Link
-                        to={c.to}
-                        className="block text-center text-sm text-neutral-600 dark:text-neutral-400
-                                   transition hover:font-semibold hover:text-brand-royal dark:hover:text-brand-sky"
-                      >
-                        {c.label}
-                      </Link>
-                    </li>
-                  ))}
-              </ul>
-            ))}
           </div>
         </div>
       </nav>
@@ -175,7 +160,7 @@ export default function Header() {
                     {item.label}
                   </Link>
                   <ul className="flex flex-col">
-                    {item.children.map((c) => (
+                    {item.children?.map((c) => (
                       <li key={c.label + c.to}>
                         <Link
                           to={c.to}
