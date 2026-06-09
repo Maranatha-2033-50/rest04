@@ -4,11 +4,34 @@ import { HashRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
 
-// GitHub Pages 정적 호스팅 호환을 위해 HashRouter 사용
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { error: null }
+  }
+  static getDerivedStateFromError(error) {
+    return { error }
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: '2rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: 'red' }}>
+          <h2>렌더링 오류</h2>
+          <p>{String(this.state.error)}</p>
+          <p>{this.state.error?.stack}</p>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </ErrorBoundary>
   </React.StrictMode>,
 )
