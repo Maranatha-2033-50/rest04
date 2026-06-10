@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
 
 const INQUIRY_TYPES = [
   { value: '', label: '문의 유형을 선택해주세요' },
@@ -40,6 +41,8 @@ export default function Support() {
   const [form, setForm] = useState(INITIAL_FORM)
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(null)
 
   const set = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
@@ -54,11 +57,29 @@ export default function Support() {
     return next
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setErrors({})
+    setSubmitError(null)
+    setSubmitting(true)
+
+    const { error } = await supabase.from('inquiries').insert({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      type: form.type,
+      title: form.subject.trim(),
+      content: form.message.trim(),
+    })
+
+    setSubmitting(false)
+
+    if (error) {
+      setSubmitError('문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      return
+    }
+
     setSubmitted(true)
   }
 
@@ -191,10 +212,21 @@ export default function Support() {
                   {errors.message && <p className="mt-1.5 text-xs text-red-500">{errors.message}</p>}
                 </div>
 
+                {/* 서버 오류 메시지 */}
+                {submitError && (
+                  <p className="rounded-xl bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+                    {submitError}
+                  </p>
+                )}
+
                 {/* 제출 버튼 */}
                 <div className="pt-2">
-                  <button type="submit" className="btn-primary w-full py-3.5 text-base font-bold">
-                    문의 제출하기
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="btn-primary w-full py-3.5 text-base font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? '제출 중...' : '문의 제출하기'}
                   </button>
                 </div>
               </form>

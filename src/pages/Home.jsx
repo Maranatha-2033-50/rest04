@@ -50,6 +50,12 @@ function Hero() {
                          hover:bg-white/10 transition-colors">
               학습 동영상 →
             </Link>
+            <a href="https://study-mate-nine-phi.vercel.app/signup"
+              className="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/30
+                         text-white px-8 py-3.5 text-base font-semibold
+                         hover:bg-white/25 transition-colors">
+              {t({ ko: '무료로 시작하기', en: 'Get Started Free' })} →
+            </a>
           </div>
         </div>
       </div>
