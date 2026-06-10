@@ -30,10 +30,12 @@ export const company = {
 }
 
 // ── Study Mate 앱 ────────────────────────────────────────────
+const EDUFOCUS_ORIGIN = 'https%3A%2F%2Fmaranatha-2033-50.github.io%2Frest04%2F%23%2F'
+
 export const studyMateApp = {
   url: 'https://study-mate-nine-phi.vercel.app',
-  loginUrl: 'https://study-mate-nine-phi.vercel.app/login',
-  signupUrl: 'https://study-mate-nine-phi.vercel.app/signup',
+  loginUrl: `https://study-mate-nine-phi.vercel.app/login?next=${EDUFOCUS_ORIGIN}`,
+  signupUrl: `https://study-mate-nine-phi.vercel.app/signup?next=${EDUFOCUS_ORIGIN}`,
   label: { ko: 'Study Mate 앱 바로가기', en: 'Go to Study Mate App' },
 }
 
