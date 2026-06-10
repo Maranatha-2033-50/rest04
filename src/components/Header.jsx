@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { nav, company } from '../data/site'
+import { nav, company, studyMateApp } from '../data/site'
 import { useLang } from '../context/LanguageContext'
+import { supabase } from '../lib/supabaseClient'
 
 function SunIcon() {
   return (
@@ -22,11 +23,21 @@ function MoonIcon() {
 
 export default function Header() {
   const { lang, toggleLang, t } = useLang()
+  const [session, setSession] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hoveredIdx, setHoveredIdx] = useState(null)
   const [dark, setDark] = useState(() =>
     document.documentElement.classList.contains('dark')
   )
+
+  useEffect(() => {
+    if (!supabase) return
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     if (dark) {
@@ -37,6 +48,17 @@ export default function Header() {
       localStorage.setItem('theme', 'light')
     }
   }, [dark])
+
+  async function handleSignOut() {
+    if (!supabase) return
+    await supabase.auth.signOut()
+    setSession(null)
+  }
+
+  const myPageLabel = lang === 'ko' ? '마이페이지' : 'My Page'
+  const signOutLabel = lang === 'ko' ? '로그아웃' : 'Sign Out'
+  const loginLabel = lang === 'ko' ? '로그인' : 'Log In'
+  const signupLabel = lang === 'ko' ? '회원가입' : 'Sign Up'
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -78,11 +100,11 @@ export default function Header() {
                 </NavLink>
 
                 {hoveredIdx === idx && item.children?.length > 0 && (
-                  <ul className="absolute left-1/2 top-full z-50 min-w-[160px] -translate-x-1/2
+                  <ul className="absolute left-1/2 top-full z-50 min-w-[180px] -translate-x-1/2
                                   rounded-xl border border-gray-100 dark:border-gray-800
                                   bg-white dark:bg-gray-950 shadow-xl py-2">
-                    {item.children.map((c) => (
-                      <li key={c.label + c.to}>
+                    {item.children.map((c, ci) => (
+                      <li key={ci}>
                         <Link
                           to={c.to}
                           onClick={() => setHoveredIdx(null)}
@@ -100,23 +122,49 @@ export default function Header() {
             ))}
           </ul>
 
-          {/* 우측: 로그인/회원가입 + 언어 토글 + 다크모드 토글 + 햄버거 */}
+          {/* 우측: 인증 버튼 + 언어 토글 + 다크모드 토글 + 햄버거 */}
           <div className="flex items-center gap-2">
-            {/* 로그인 / 회원가입 — 데스크탑만 표시 */}
-            <a href="https://study-mate-nine-phi.vercel.app/login"
-              className="hidden lg:inline-flex items-center rounded-full border border-gray-200
-                         dark:border-gray-700 px-4 py-2 text-xs font-semibold
-                         text-neutral-700 dark:text-neutral-300
-                         hover:border-brand-royal dark:hover:border-brand-sky
-                         hover:text-brand-royal dark:hover:text-brand-sky transition-colors">
-              로그인
-            </a>
-            <a href="https://study-mate-nine-phi.vercel.app/signup"
-              className="hidden lg:inline-flex items-center rounded-full bg-brand-royal text-white
-                         px-4 py-2 text-xs font-semibold
-                         hover:bg-brand-navy dark:hover:bg-brand-sky transition-colors">
-              회원가입
-            </a>
+            {/* 로그인 상태에 따라 버튼 동적 전환 — 데스크탑만 */}
+            {session ? (
+              <>
+                <a href={studyMateApp.url}
+                  className="hidden lg:inline-flex items-center rounded-full border border-gray-200
+                             dark:border-gray-700 px-4 py-2 text-xs font-semibold
+                             text-neutral-700 dark:text-neutral-300
+                             hover:border-brand-royal dark:hover:border-brand-sky
+                             hover:text-brand-royal dark:hover:text-brand-sky transition-colors">
+                  {myPageLabel}
+                </a>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="hidden lg:inline-flex items-center rounded-full bg-gray-100
+                             dark:bg-gray-800 px-4 py-2 text-xs font-semibold
+                             text-neutral-600 dark:text-neutral-300
+                             hover:bg-red-50 hover:text-red-600
+                             dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-colors">
+                  {signOutLabel}
+                </button>
+              </>
+            ) : (
+              <>
+                <a href={studyMateApp.loginUrl}
+                  className="hidden lg:inline-flex items-center rounded-full border border-gray-200
+                             dark:border-gray-700 px-4 py-2 text-xs font-semibold
+                             text-neutral-700 dark:text-neutral-300
+                             hover:border-brand-royal dark:hover:border-brand-sky
+                             hover:text-brand-royal dark:hover:text-brand-sky transition-colors">
+                  {loginLabel}
+                </a>
+                <a href={studyMateApp.signupUrl}
+                  className="hidden lg:inline-flex items-center rounded-full bg-brand-royal text-white
+                             px-4 py-2 text-xs font-semibold
+                             hover:bg-brand-navy dark:hover:bg-brand-sky transition-colors">
+                  {signupLabel}
+                </a>
+              </>
+            )}
+
             {/* KR / EN 언어 토글 */}
             <button
               type="button"
@@ -127,15 +175,11 @@ export default function Header() {
                          text-xs font-bold transition-colors
                          hover:border-brand-royal dark:hover:border-brand-sky"
             >
-              <span className={lang === 'ko'
-                ? 'text-brand-royal dark:text-brand-sky'
-                : 'text-neutral-400 dark:text-neutral-600'}>
+              <span className={lang === 'ko' ? 'text-brand-royal dark:text-brand-sky' : 'text-neutral-400 dark:text-neutral-600'}>
                 KR
               </span>
               <span className="mx-0.5 text-neutral-300 dark:text-neutral-700">·</span>
-              <span className={lang === 'en'
-                ? 'text-brand-royal dark:text-brand-sky'
-                : 'text-neutral-400 dark:text-neutral-600'}>
+              <span className={lang === 'en' ? 'text-brand-royal dark:text-brand-sky' : 'text-neutral-400 dark:text-neutral-600'}>
                 EN
               </span>
             </button>
@@ -171,10 +215,7 @@ export default function Header() {
       {/* 모바일 패널 */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setMobileOpen(false)}
-          />
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
           <div className="absolute right-0 top-0 h-full w-4/5 max-w-sm overflow-y-auto
                           bg-white dark:bg-gray-950 p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
@@ -189,13 +230,9 @@ export default function Header() {
                   className="flex h-8 items-center gap-0.5 rounded-full border px-2.5
                              border-gray-200 dark:border-gray-700 text-xs font-bold transition-colors"
                 >
-                  <span className={lang === 'ko'
-                    ? 'text-brand-royal dark:text-brand-sky'
-                    : 'text-neutral-400 dark:text-neutral-600'}>KR</span>
+                  <span className={lang === 'ko' ? 'text-brand-royal dark:text-brand-sky' : 'text-neutral-400 dark:text-neutral-600'}>KR</span>
                   <span className="mx-0.5 text-neutral-300 dark:text-neutral-700">·</span>
-                  <span className={lang === 'en'
-                    ? 'text-brand-royal dark:text-brand-sky'
-                    : 'text-neutral-400 dark:text-neutral-600'}>EN</span>
+                  <span className={lang === 'en' ? 'text-brand-royal dark:text-brand-sky' : 'text-neutral-400 dark:text-neutral-600'}>EN</span>
                 </button>
                 <button
                   type="button"
@@ -207,22 +244,45 @@ export default function Header() {
                 </button>
               </div>
             </div>
-            {/* 모바일 로그인/회원가입 */}
+
+            {/* 모바일 인증 버튼 */}
             <div className="mb-6 flex gap-3">
-              <a href="https://study-mate-nine-phi.vercel.app/login"
-                className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700
-                           py-2.5 text-center text-sm font-semibold
-                           text-neutral-700 dark:text-neutral-300
-                           hover:border-brand-royal hover:text-brand-royal
-                           dark:hover:border-brand-sky dark:hover:text-brand-sky transition-colors">
-                로그인
-              </a>
-              <a href="https://study-mate-nine-phi.vercel.app/signup"
-                className="flex-1 rounded-xl bg-brand-royal text-white
-                           py-2.5 text-center text-sm font-semibold
-                           hover:bg-brand-navy dark:hover:bg-brand-sky transition-colors">
-                회원가입
-              </a>
+              {session ? (
+                <>
+                  <a href={studyMateApp.url}
+                    className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700
+                               py-2.5 text-center text-sm font-semibold
+                               text-neutral-700 dark:text-neutral-300
+                               hover:border-brand-royal hover:text-brand-royal transition-colors">
+                    {myPageLabel}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="flex-1 rounded-xl border border-red-200 dark:border-red-800
+                               py-2.5 text-center text-sm font-semibold
+                               text-red-600 dark:text-red-400 transition-colors">
+                    {signOutLabel}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <a href={studyMateApp.loginUrl}
+                    className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700
+                               py-2.5 text-center text-sm font-semibold
+                               text-neutral-700 dark:text-neutral-300
+                               hover:border-brand-royal hover:text-brand-royal
+                               dark:hover:border-brand-sky dark:hover:text-brand-sky transition-colors">
+                    {loginLabel}
+                  </a>
+                  <a href={studyMateApp.signupUrl}
+                    className="flex-1 rounded-xl bg-brand-royal text-white
+                               py-2.5 text-center text-sm font-semibold
+                               hover:bg-brand-navy dark:hover:bg-brand-sky transition-colors">
+                    {signupLabel}
+                  </a>
+                </>
+              )}
             </div>
 
             <ul className="flex flex-col gap-2">
@@ -236,8 +296,8 @@ export default function Header() {
                     {t(item.label)}
                   </Link>
                   <ul className="flex flex-col">
-                    {item.children?.map((c) => (
-                      <li key={c.label + c.to}>
+                    {item.children?.map((c, ci) => (
+                      <li key={ci}>
                         <Link
                           to={c.to}
                           className="block py-1.5 pl-3 text-sm text-neutral-500 dark:text-neutral-400

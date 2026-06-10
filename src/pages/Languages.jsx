@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import SubPageLayout from '../components/SubPageLayout'
 import { languagesPages } from '../data/site'
+import { useLang } from '../context/LanguageContext'
 
 const tabs = [
   { label: 'IELTS', to: '/languages/ielts' },
@@ -31,27 +32,29 @@ function SkillSection({ sections }) {
 }
 
 function ExamInfo({ data }) {
+  const { t, lang } = useLang()
+
   return (
     <div className="mx-auto max-w-container section-x">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         {/* 좌측: 시험 소개 */}
         <div>
-          <span className="badge mb-4">{data.level}</span>
+          <span className="badge mb-4">{t(data.level)}</span>
           <h3 className="mb-4 text-2xl font-extrabold text-brand-navy dark:text-white">
-            {data.title} 취약점 집중 학습
+            {data.title} {lang === 'ko' ? '취약점 집중 학습' : 'Intensive Weak-Point Training'}
           </h3>
-          <p className="mb-8 leading-8 text-neutral-600 dark:text-neutral-400">{data.desc}</p>
+          <p className="mb-8 leading-8 text-neutral-600 dark:text-neutral-400">{t(data.desc)}</p>
 
           <div className="card p-6 mb-6">
             <p className="mb-3 text-sm font-bold text-brand-royal dark:text-brand-sky uppercase tracking-wide">
-              목표 점수
+              {lang === 'ko' ? '목표 점수' : 'Target Score'}
             </p>
-            <p className="text-2xl font-extrabold text-brand-navy dark:text-white">{data.targetScore}</p>
+            <p className="text-2xl font-extrabold text-brand-navy dark:text-white">{t(data.targetScore)}</p>
           </div>
 
           <div className="card p-6">
             <p className="mb-4 text-sm font-bold text-brand-royal dark:text-brand-sky uppercase tracking-wide">
-              에듀포커스 학습 과정
+              {lang === 'ko' ? '에듀포커스 학습 과정' : 'EDUFOCUS Study Process'}
             </p>
             <ul className="space-y-3">
               {data.learningSteps.map((step, i) => (
@@ -61,7 +64,7 @@ function ExamInfo({ data }) {
                                    text-xs font-bold mt-0.5">
                     {i + 1}
                   </span>
-                  {step}
+                  {t(step)}
                 </li>
               ))}
             </ul>
@@ -71,7 +74,7 @@ function ExamInfo({ data }) {
         {/* 우측: 평가 영역 */}
         <div>
           <p className="mb-6 text-sm font-bold text-brand-royal dark:text-brand-sky uppercase tracking-wide">
-            평가 영역
+            {lang === 'ko' ? '평가 영역' : 'Assessment Skills'}
           </p>
           <SkillSection sections={data.sections} />
 
@@ -79,18 +82,22 @@ function ExamInfo({ data }) {
           <div className="mt-8 rounded-2xl bg-gradient-to-br from-brand-navy to-brand-royal
                           dark:from-gray-900 dark:to-brand-navy p-8 text-white">
             <p className="mb-2 text-xs font-semibold tracking-widest text-brand-sky/80 uppercase">
-              AI 취약점 분석
+              {lang === 'ko' ? 'AI 취약점 분석' : 'AI Weak-Point Analysis'}
             </p>
             <p className="mb-4 text-xl font-bold">
-              에듀포커스 AI 앱으로<br />나만의 루틴을 만드세요
+              {lang === 'ko'
+                ? `에듀포커스 AI 앱으로\n나만의 루틴을 만드세요`
+                : `Build your personalized\n${data.title} study routine`}
             </p>
             <p className="mb-6 text-sm text-white/70 leading-relaxed">
-              AI가 {data.title} 각 영역의 취약점을 자동 분석하고 집중 학습 문제를 제공합니다.
+              {lang === 'ko'
+                ? `AI가 ${data.title} 각 영역의 취약점을 자동 분석하고 집중 학습 문제를 제공합니다.`
+                : `AI automatically analyzes your weak areas across all ${data.title} skills and delivers targeted practice.`}
             </p>
             <a href="/ai-app"
               className="inline-flex items-center gap-2 rounded-full bg-white/20
                          hover:bg-white/30 transition px-5 py-2.5 text-sm font-semibold">
-              AI 앱 자세히 보기 →
+              {lang === 'ko' ? 'AI 앱 자세히 보기 →' : 'Learn About the AI App →'}
             </a>
           </div>
         </div>
@@ -101,10 +108,15 @@ function ExamInfo({ data }) {
 
 export default function Languages() {
   const { tab } = useParams()
+  const { t } = useLang()
   const data = languagesPages[tab] ?? languagesPages['ielts']
 
   return (
-    <SubPageLayout sectionTitle="어학" tabs={tabs} headLabel={data.headLabel}>
+    <SubPageLayout
+      sectionTitle={{ ko: '어학', en: 'Languages' }}
+      tabs={tabs}
+      headLabel={data.headLabel}
+    >
       <ExamInfo data={data} />
     </SubPageLayout>
   )

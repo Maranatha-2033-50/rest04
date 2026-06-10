@@ -1,6 +1,10 @@
 import { NavLink } from 'react-router-dom'
+import { useLang } from '../context/LanguageContext'
 
 export default function SubPageLayout({ sectionTitle, tabs, headLabel, children }) {
+  const { t } = useLang()
+  const titleText = t(sectionTitle)
+
   return (
     <div>
       {/* Sticky 탭 네비 */}
@@ -10,18 +14,18 @@ export default function SubPageLayout({ sectionTitle, tabs, headLabel, children 
           <div className="flex flex-col-reverse justify-between md:flex-row">
             <h2 className="mb-6 text-3xl font-bold leading-none text-brand-navy dark:text-brand-sky
                            md:mb-10 md:text-4xl">
-              {sectionTitle}
+              {titleText}
             </h2>
             <p className="mb-3 text-sm font-medium text-neutral-400 dark:text-neutral-500 md:mb-0">
-              홈 <span className="mx-2 text-neutral-300">/</span> {sectionTitle}
+              {t({ ko: '홈', en: 'Home' })} <span className="mx-2 text-neutral-300">/</span> {titleText}
             </p>
           </div>
 
           <ul className="flex w-full overflow-x-auto font-semibold">
-            {tabs.map((t) => (
-              <li key={t.to} className="shrink-0">
+            {tabs.map((tab) => (
+              <li key={tab.to} className="shrink-0">
                 <NavLink
-                  to={t.to}
+                  to={tab.to}
                   className={({ isActive }) =>
                     [
                       'block whitespace-nowrap border-b-2 px-4 py-4 text-sm transition md:px-8 md:py-5 md:text-base',
@@ -31,7 +35,7 @@ export default function SubPageLayout({ sectionTitle, tabs, headLabel, children 
                     ].join(' ')
                   }
                 >
-                  {t.label}
+                  {t(tab.label)}
                 </NavLink>
               </li>
             ))}
@@ -46,7 +50,7 @@ export default function SubPageLayout({ sectionTitle, tabs, headLabel, children 
           <p className="text-sm font-semibold tracking-widest text-brand-sky/80 uppercase mb-2">
             {headLabel}
           </p>
-          <p className="text-3xl font-bold text-white md:text-5xl">{sectionTitle}</p>
+          <p className="text-3xl font-bold text-white md:text-5xl">{titleText}</p>
         </div>
       </div>
 

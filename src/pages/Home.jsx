@@ -87,13 +87,16 @@ function Hero() {
 }
 
 function Services() {
+  const { t, lang } = useLang()
   return (
     <section className="py-24 md:py-32 bg-white dark:bg-gray-950 transition-colors">
       <div className="mx-auto max-w-container section-x">
         <div className="mb-14 text-center">
-          <span className="badge mb-3">학습 서비스</span>
+          <span className="badge mb-3">{lang === 'ko' ? '학습 서비스' : 'Services'}</span>
           <h2 className="text-4xl font-extrabold text-brand-navy dark:text-white md:text-5xl">
-            취약점을 분석하고,<br className="hidden sm:block" /> 합격을 설계합니다
+            {lang === 'ko'
+              ? <><>취약점을 분석하고,</><br className="hidden sm:block" /> 합격을 설계합니다</>
+              : <><>Diagnose your weak points,</><br className="hidden sm:block" /> design your path to success.</>}
           </h2>
         </div>
 
@@ -103,9 +106,9 @@ function Services() {
               className="card group p-8 hover:shadow-lg hover:-translate-y-1 transition-all">
               <div className="mb-5 text-5xl">{s.icon}</div>
               <h3 className="mb-3 text-2xl font-bold text-brand-navy dark:text-white group-hover:text-brand-royal dark:group-hover:text-brand-sky transition-colors">
-                {s.title}
+                {t(s.title)}
               </h3>
-              <p className="mb-5 text-sm leading-7 text-neutral-600 dark:text-neutral-400">{s.desc}</p>
+              <p className="mb-5 text-sm leading-7 text-neutral-600 dark:text-neutral-400">{t(s.desc)}</p>
               <div className="flex flex-wrap gap-2">
                 {s.tags.map((tag) => (
                   <span key={tag} className="badge text-xs">{tag}</span>
@@ -113,7 +116,7 @@ function Services() {
               </div>
               <div className="mt-6 flex items-center gap-2 text-sm font-semibold
                               text-brand-royal dark:text-brand-sky group-hover:gap-3 transition-all">
-                자세히 보기 <span>→</span>
+                {lang === 'ko' ? '자세히 보기' : 'Learn more'} <span>→</span>
               </div>
             </Link>
           ))}

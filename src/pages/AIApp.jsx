@@ -45,22 +45,25 @@ function HeroSection() {
 }
 
 function FeaturesSection() {
+  const { t, lang } = useLang()
   return (
     <section id="analysis" className="py-24 md:py-32 bg-white dark:bg-gray-950 transition-colors">
       <div className="mx-auto max-w-container section-x">
         <div className="mb-14 text-center">
-          <span className="badge mb-3">핵심 기능</span>
+          <span className="badge mb-3">{lang === 'ko' ? '핵심 기능' : 'Key Features'}</span>
           <h2 className="text-3xl font-extrabold text-brand-navy dark:text-white md:text-4xl">
-            AI가 나의 취약점을 파악하고<br />학습 루틴을 설계합니다
+            {lang === 'ko'
+              ? <>AI가 나의 취약점을 파악하고<br />학습 루틴을 설계합니다</>
+              : <>AI identifies your weak points<br />and designs your study routine</>}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {aiAppFeatures.map((f) => (
-            <div key={f.title} className="card p-7 hover:shadow-md transition-shadow">
+          {aiAppFeatures.map((f, i) => (
+            <div key={i} className="card p-7 hover:shadow-md transition-shadow">
               <div className="mb-4 text-4xl">{f.icon}</div>
-              <h3 className="mb-3 text-lg font-bold text-brand-navy dark:text-white">{f.title}</h3>
-              <p className="text-sm leading-7 text-neutral-600 dark:text-neutral-400">{f.desc}</p>
+              <h3 className="mb-3 text-lg font-bold text-brand-navy dark:text-white">{t(f.title)}</h3>
+              <p className="text-sm leading-7 text-neutral-600 dark:text-neutral-400">{t(f.desc)}</p>
             </div>
           ))}
         </div>
@@ -70,20 +73,21 @@ function FeaturesSection() {
 }
 
 function SupportedExams() {
+  const { t, lang } = useLang()
   return (
     <section className="py-20 bg-brand-light dark:bg-gray-900 transition-colors">
       <div className="mx-auto max-w-container section-x">
         <div className="mb-10 text-center">
-          <span className="badge mb-3">지원 시험</span>
+          <span className="badge mb-3">{lang === 'ko' ? '지원 시험' : 'Supported Exams'}</span>
           <h2 className="text-2xl font-extrabold text-brand-navy dark:text-white md:text-3xl">
-            주요 어학·자격증 시험 지원
+            {lang === 'ko' ? '주요 어학·자격증 시험 지원' : 'Major Language & Certification Exams Supported'}
           </h2>
         </div>
         <div className="flex flex-wrap justify-center gap-4">
-          {aiAppSupportedExams.map((e) => (
-            <div key={e.label} className="card px-6 py-4 text-center min-w-[140px]">
-              <p className="font-bold text-brand-royal dark:text-brand-sky">{e.label}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{e.sub}</p>
+          {aiAppSupportedExams.map((e, i) => (
+            <div key={i} className="card px-6 py-4 text-center min-w-[140px]">
+              <p className="font-bold text-brand-royal dark:text-brand-sky">{t(e.label)}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{t(e.sub)}</p>
             </div>
           ))}
         </div>
