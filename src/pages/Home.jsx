@@ -57,13 +57,6 @@ function Hero() {
       {/* 가독성 그라디언트 — 텍스트가 놓이는 좌측을 짙게 처리 */}
       <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/90 via-brand-navy/60 to-brand-royal/25
                       dark:from-gray-950/95 dark:via-brand-navy/75 dark:to-brand-royal/45" />
-      {/* 도트 패턴 */}
-      <div className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
-          backgroundSize: '60px 60px, 40px 40px',
-        }}
-      />
 
       <div className="relative z-10 mx-auto w-full max-w-container section-x py-24">
         <div className="transition-all duration-700">
