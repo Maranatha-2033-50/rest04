@@ -3,7 +3,7 @@ import { videoTopics, aiAppFeatures, aiAppSupportedExams, studyMateApp } from '.
 import { useLang } from '../context/LanguageContext'
 
 function HeroSection() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
 
   return (
     <section className="bg-gradient-to-br from-brand-navy via-brand-royal to-brand-sky
@@ -12,25 +12,29 @@ function HeroSection() {
       <div className="mx-auto max-w-container section-x">
         <div className="max-w-2xl">
           <span className="badge mb-6 border-brand-sky/30 bg-brand-sky/10 text-brand-sky text-xs tracking-widest uppercase">
-            AI 학습 기술
+            {t({ ko: 'AI 학습 기술', en: 'AI Learning Technology' })}
           </span>
           <h1 className="mb-6 text-4xl font-extrabold leading-tight text-white md:text-6xl">
-            AI 취약점 분석으로<br />합격을 설계합니다
+            {lang === 'ko'
+              ? <>AI 취약점 분석으로<br />합격을 설계합니다</>
+              : <>Engineer Your Success<br />with AI Weak-Point Analysis</>}
           </h1>
           <p className="mb-10 text-lg leading-relaxed text-white/80">
-            에듀포커스 AI 학습앱은 학습자의 취약점을 정밀 분석하고,
-            IELTS·DELF·자격증 목표 점수 달성까지 최단 경로의 학습 루틴을 자동으로 설계합니다.
+            {t({
+              ko: '에듀포커스 AI 학습앱은 학습자의 취약점을 정밀 분석하고, IELTS·DELF·자격증 목표 점수 달성까지 최단 경로의 학습 루틴을 자동으로 설계합니다.',
+              en: 'The EDUFOCUS AI app precisely analyzes your weak points and automatically designs the shortest-path study routine to hit your target score across IELTS, DELF, and certification exams.',
+            })}
           </p>
           <div id="download" className="flex flex-wrap gap-4">
             <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-full bg-white text-brand-navy
                          px-8 py-3.5 text-base font-bold shadow hover:shadow-lg transition">
-              <span>🍎</span> iOS 다운로드
+              <span>🍎</span> {t({ ko: 'iOS 다운로드', en: 'Download for iOS' })}
             </a>
             <a href="https://play.google.com" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-full bg-white/20 text-white
                          border border-white/30 px-8 py-3.5 text-base font-bold hover:bg-white/30 transition">
-              <span>🤖</span> Android 다운로드
+              <span>🤖</span> {t({ ko: 'Android 다운로드', en: 'Download for Android' })}
             </a>
             <a href={studyMateApp.url} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-full bg-brand-amber text-white
@@ -97,7 +101,8 @@ function SupportedExams() {
 }
 
 function VideoSection() {
-  const aiVideos = videoTopics.find((t) => t.key === 'ai-app')
+  const { t } = useLang()
+  const aiVideos = videoTopics.find((v) => v.key === 'ai-app')
   const preview = aiVideos?.videos.slice(0, 2) ?? []
 
   return (
@@ -105,14 +110,14 @@ function VideoSection() {
       <div className="mx-auto max-w-container section-x">
         <div className="mb-12 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <span className="badge mb-3">학습 동영상</span>
+            <span className="badge mb-3">{t({ ko: '학습 동영상', en: 'Learning Videos' })}</span>
             <h2 className="text-2xl font-extrabold text-brand-navy dark:text-white md:text-3xl">
-              AI 앱 활용법 영상
+              {t({ ko: 'AI 앱 활용법 영상', en: 'AI App How-To Videos' })}
             </h2>
           </div>
           <Link to="/videos/ai-app"
             className="text-sm font-semibold text-brand-royal dark:text-brand-sky hover:underline">
-            전체 영상 보기 →
+            {t({ ko: '전체 영상 보기 →', en: 'View All Videos →' })}
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -127,10 +132,12 @@ function VideoSection() {
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
-                <p className="text-xs text-neutral-400 dark:text-neutral-500">영상 준비 중</p>
+                <p className="text-xs text-neutral-400 dark:text-neutral-500">
+                  {t({ ko: 'YouTube 영상 준비 중', en: 'YouTube Video Coming Soon' })}
+                </p>
               </div>
               <div className="p-5">
-                <p className="font-semibold text-neutral-800 dark:text-neutral-200">{v.title}</p>
+                <p className="font-semibold text-neutral-800 dark:text-neutral-200">{t(v.title)}</p>
               </div>
             </div>
           ))}

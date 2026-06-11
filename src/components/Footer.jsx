@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 import { company } from '../data/site'
+import { useLang } from '../context/LanguageContext'
 
 export default function Footer() {
+  const { t } = useLang()
+  const relatedSitesLabel = t({ ko: '관련 사이트', en: 'Related Sites' })
   return (
     <footer className="mt-auto">
       {/* 상단: 브랜드 소개 */}
@@ -13,12 +16,12 @@ export default function Footer() {
                 {company.name}
               </p>
               <p className="mt-1 text-sm font-medium text-brand-royal dark:text-brand-sky/70">
-                {company.slogan}
+                {t(company.slogan)}
               </p>
             </div>
             <div className="flex-grow space-y-3 text-sm leading-7 text-neutral-600 dark:text-neutral-400">
               {company.intro.map((p, i) => (
-                <p key={i}>{p}</p>
+                <p key={i}>{t(p)}</p>
               ))}
             </div>
           </div>
@@ -31,11 +34,11 @@ export default function Footer() {
           <div className="flex flex-col gap-8 md:flex-row md:justify-between">
             {/* 주소 */}
             <div className="flex flex-col gap-3 text-sm">
-              {company.offices.map((o) => (
-                <div key={o.label} className="flex flex-col gap-1 md:flex-row md:gap-8">
-                  <span className="w-16 shrink-0 font-bold text-brand-sky">{o.label}</span>
+              {company.offices.map((o, i) => (
+                <div key={i} className="flex flex-col gap-1 md:flex-row md:gap-8">
+                  <span className="w-24 shrink-0 font-bold text-brand-sky">{t(o.label)}</span>
                   <ul className="flex flex-col gap-1 text-neutral-400 md:flex-row md:gap-6">
-                    <li className="md:w-64">{o.address}</li>
+                    <li className="md:w-64">{t(o.address)}</li>
                     <li>Tel {o.tel}</li>
                     <li>Fax {o.fax}</li>
                   </ul>
@@ -46,15 +49,15 @@ export default function Footer() {
             {/* 관련 사이트 */}
             <div className="w-full md:w-52">
               <select
-                aria-label="관련 사이트"
+                aria-label={relatedSitesLabel}
                 className="w-full rounded border border-gray-600 bg-transparent px-4 py-2.5
                            text-sm font-bold text-neutral-300 cursor-pointer"
                 defaultValue=""
                 onChange={(e) => { if (e.target.value) window.open(e.target.value, '_blank') }}
               >
-                <option value="" disabled>관련 사이트</option>
+                <option value="" disabled>{relatedSitesLabel}</option>
                 {company.familySites.map((f) => (
-                  <option key={f.name} value={f.url} className="text-black">{f.name}</option>
+                  <option key={f.url} value={f.url} className="text-black">{t(f.name)}</option>
                 ))}
               </select>
             </div>
@@ -66,7 +69,7 @@ export default function Footer() {
                           md:flex-row md:items-center">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {company.footerLinks.map((l) => (
-                <li key={l.label}>
+                <li key={l.to}>
                   <Link
                     to={l.to}
                     className={
@@ -75,7 +78,7 @@ export default function Footer() {
                         : 'text-neutral-400 hover:text-white transition-colors'
                     }
                   >
-                    {l.label}
+                    {t(l.label)}
                   </Link>
                 </li>
               ))}

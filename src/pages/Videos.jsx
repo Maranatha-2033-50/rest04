@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useParams, NavLink } from 'react-router-dom'
 import { videoTopics } from '../data/site'
+import { useLang } from '../context/LanguageContext'
 
 const VIDEOS_PER_PAGE = 6 // 2열 × 3행
 
 function VideoCard({ video }) {
+  const { t } = useLang()
   const isPlaceholder = !video.id || video.id.startsWith('PLACEHOLDER')
 
   return (
@@ -21,14 +23,14 @@ function VideoCard({ video }) {
             </svg>
           </div>
           <p className="text-xs text-neutral-400 dark:text-neutral-500">
-            영상 ID: <code className="font-mono text-brand-royal/60 dark:text-brand-sky/60">{video.id}</code>
+            {t({ ko: 'YouTube 영상 준비 중', en: 'YouTube Video Coming Soon' })}
           </p>
         </div>
       ) : (
         <div className="aspect-video w-full">
           <iframe
             src={`https://www.youtube.com/embed/${video.id}`}
-            title={video.title}
+            title={t(video.title)}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             loading="lazy"
@@ -38,7 +40,7 @@ function VideoCard({ video }) {
       )}
       <div className="p-4">
         <p className="font-semibold leading-snug text-neutral-800 dark:text-neutral-200">
-          {video.title}
+          {t(video.title)}
         </p>
       </div>
     </div>
@@ -96,9 +98,10 @@ function Pagination({ page, totalPages, onPage }) {
 
 export default function Videos() {
   const { topic } = useParams()
+  const { t, lang } = useLang()
   const [pages, setPages] = useState({})
 
-  const current = videoTopics.find((t) => t.key === topic) ?? videoTopics[0]
+  const current = videoTopics.find((vt) => vt.key === topic) ?? videoTopics[0]
   const page = pages[current.key] ?? 1
   const totalPages = Math.ceil(current.videos.length / VIDEOS_PER_PAGE)
   const slice = current.videos.slice((page - 1) * VIDEOS_PER_PAGE, page * VIDEOS_PER_PAGE)
@@ -117,9 +120,14 @@ export default function Videos() {
           <p className="text-xs font-semibold tracking-widest text-brand-sky/80 uppercase mb-2">
             LEARNING VIDEOS
           </p>
-          <h1 className="text-3xl font-extrabold text-white md:text-5xl">학습 동영상</h1>
+          <h1 className="text-3xl font-extrabold text-white md:text-5xl">
+            {t({ ko: '학습 동영상', en: 'Learning Videos' })}
+          </h1>
           <p className="mt-4 text-white/70 text-sm md:text-base">
-            주제별 학습 TIP 영상과 AI 앱 활용법을 확인하세요
+            {t({
+              ko: '주제별 학습 TIP 영상과 AI 앱 활용법을 확인하세요',
+              en: 'Explore topic-by-topic study tips and AI app how-to videos',
+            })}
           </p>
         </div>
       </div>
@@ -129,11 +137,11 @@ export default function Videos() {
                       border-b border-gray-100 dark:border-gray-800 transition-colors">
         <div className="mx-auto max-w-container section-x">
           <ul className="flex overflow-x-auto font-semibold">
-            {videoTopics.map((t) => (
-              <li key={t.key} className="shrink-0">
+            {videoTopics.map((vt) => (
+              <li key={vt.key} className="shrink-0">
                 <NavLink
-                  to={t.to}
-                  onClick={() => setPages((prev) => ({ ...prev, [t.key]: 1 }))}
+                  to={vt.to}
+                  onClick={() => setPages((prev) => ({ ...prev, [vt.key]: 1 }))}
                   className={({ isActive }) =>
                     [
                       'block whitespace-nowrap border-b-2 px-4 py-4 text-sm transition md:px-6 md:py-5',
@@ -143,7 +151,7 @@ export default function Videos() {
                     ].join(' ')
                   }
                 >
-                  {t.label}
+                  {t(vt.label)}
                 </NavLink>
               </li>
             ))}
@@ -156,10 +164,12 @@ export default function Videos() {
         <div className="mx-auto max-w-container section-x">
           <div className="mb-8 flex items-center justify-between">
             <h2 className="text-xl font-bold text-brand-navy dark:text-white">
-              {current.label} 학습 영상
+              {lang === 'ko' ? `${t(current.label)} 학습 영상` : `${t(current.label)} Videos`}
             </h2>
             <span className="text-sm text-neutral-400 dark:text-neutral-500">
-              {page} / {totalPages} 페이지 · 총 {current.videos.length}개
+              {lang === 'ko'
+                ? `${page} / ${totalPages} 페이지 · 총 ${current.videos.length}개`
+                : `Page ${page} / ${totalPages} · ${current.videos.length} videos`}
             </span>
           </div>
 
@@ -172,7 +182,10 @@ export default function Videos() {
           <Pagination page={page} totalPages={totalPages} onPage={handlePage} />
 
           <p className="mt-8 text-center text-xs text-neutral-400 dark:text-neutral-600">
-            * 영상 ID가 PLACEHOLDER로 표시된 경우 <code className="font-mono">src/data/site.js</code>에서 실제 YouTube 영상 ID로 교체하세요.
+            {t({
+              ko: '* 영상이 준비되는 대로 순차적으로 업데이트됩니다.',
+              en: '* Videos are being added and will appear here as they become available.',
+            })}
           </p>
         </div>
       </section>

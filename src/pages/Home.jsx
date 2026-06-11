@@ -242,7 +242,7 @@ function LatestVideos() {
               <div className="relative aspect-video w-full overflow-hidden">
                 <img
                   src={VIDEO_IMG[i % VIDEO_IMG.length]}
-                  alt={v.title}
+                  alt={t(v.title)}
                   className="w-full h-full object-cover grayscale group-hover:grayscale-0
                              group-hover:scale-105 transition-all duration-500"
                 />
@@ -259,7 +259,7 @@ function LatestVideos() {
                 </div>
               </div>
               <div className="p-5">
-                <p className="font-semibold text-neutral-800 dark:text-neutral-200 leading-snug">{v.title}</p>
+                <p className="font-semibold text-neutral-800 dark:text-neutral-200 leading-snug">{t(v.title)}</p>
                 <p className="mt-1 text-xs text-brand-royal dark:text-brand-sky">
                   {t({ ko: 'IELTS 학습 TIP', en: 'IELTS Study Tips' })}
                 </p>
@@ -272,8 +272,7 @@ function LatestVideos() {
           {videoTopics.map((topic) => (
             <Link key={topic.key} to={topic.to}
               className="btn-outline text-xs px-5 py-2">
-              {typeof topic.label === 'object' ? t(topic.label) : topic.label}
-              {lang === 'ko' ? ' 영상' : ' Videos'}
+              {t(topic.label)}{lang === 'ko' ? ' 영상' : ' Videos'}
             </Link>
           ))}
         </div>
