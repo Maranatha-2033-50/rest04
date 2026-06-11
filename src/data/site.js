@@ -142,10 +142,10 @@ export const serviceCards = [
 ]
 
 export const notices = [
-  { id: 4, title: '2026 하반기 IELTS 집중반 모집 안내', date: '2026.06.01' },
-  { id: 3, title: 'DELF B2·C1 무료 취약점 진단 이벤트 (6월)', date: '2026.05.25' },
-  { id: 2, title: '정보처리기사 2차 실기 대비 집중 특강 오픈', date: '2026.05.18' },
-  { id: 1, title: 'AI 학습앱 v2.0 업데이트 — 취약점 리포트 기능 강화', date: '2026.05.10' },
+  { id: 4, title: { ko: '2026 하반기 IELTS 집중반 모집 안내', en: '2026 H2 IELTS Intensive Program — Open Enrollment' }, date: '2026.06.01' },
+  { id: 3, title: { ko: 'DELF B2·C1 무료 취약점 진단 이벤트 (6월)', en: 'Free DELF B2·C1 Weak-Point Diagnosis Event (June)' }, date: '2026.05.25' },
+  { id: 2, title: { ko: '정보처리기사 2차 실기 대비 집중 특강 오픈', en: 'IT Engineer Level 2 Practical Intensive — Now Open' }, date: '2026.05.18' },
+  { id: 1, title: { ko: 'AI 학습앱 v2.0 업데이트 — 취약점 리포트 기능 강화', en: 'AI App v2.0 Update — Enhanced Weak-Point Report Engine' }, date: '2026.05.10' },
 ]
 
 // ── 메인 홈 — 히어로 슬라이더 ───────────────────────────────

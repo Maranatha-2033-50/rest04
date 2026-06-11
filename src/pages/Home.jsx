@@ -3,6 +3,23 @@ import { Link } from 'react-router-dom'
 import { serviceCards, notices, videoTopics, heroSlides } from '../data/site'
 import { useLang } from '../context/LanguageContext'
 
+// ─── Editorial images — natural light, minimal studio (Unsplash) ────────────
+const HERO_BG =
+  'https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1920&q=80'
+
+const SERVICE_IMG = {
+  languages:      'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=80',
+  certifications: 'https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?auto=format&fit=crop&w=800&q=80',
+  subjects:       'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=800&q=80',
+}
+
+const VIDEO_IMG = [
+  'https://images.unsplash.com/photo-1434030216411-0b793f4b6f6a?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?auto=format&fit=crop&w=600&q=80',
+]
+
+// ─── Hero ────────────────────────────────────────────────────────────────────
 function Hero() {
   const { t } = useLang()
   const [idx, setIdx] = useState(0)
@@ -16,11 +33,16 @@ function Hero() {
   const s = heroSlides[idx]
 
   return (
-    <section className="relative min-h-[calc(100vh-5rem)] w-full overflow-hidden
-                        bg-gradient-to-br from-brand-navy via-brand-royal to-brand-sky
-                        dark:from-gray-950 dark:via-brand-navy dark:to-brand-royal
-                        flex items-center">
-      {/* 배경 패턴 */}
+    <section className="relative min-h-[calc(100vh-5rem)] w-full overflow-hidden flex items-center">
+      {/* 에디토리얼 배경 이미지 */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('${HERO_BG}')` }}
+      />
+      {/* 그라디언트 오버레이 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-navy/96 via-brand-royal/88 to-brand-sky/70
+                      dark:from-gray-950/97 dark:via-brand-navy/92 dark:to-brand-royal/82" />
+      {/* 도트 패턴 */}
       <div className="absolute inset-0 opacity-10"
         style={{
           backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
@@ -48,13 +70,13 @@ function Hero() {
               className="inline-flex items-center gap-2 rounded-full border border-white/40
                          text-white px-8 py-3.5 text-base font-semibold
                          hover:bg-white/10 transition-colors">
-              학습 동영상 →
+              {t({ ko: '학습 동영상 →', en: 'Learning Videos →' })}
             </Link>
             <a href="https://study-mate-nine-phi.vercel.app/signup"
               className="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/30
                          text-white px-8 py-3.5 text-base font-semibold
                          hover:bg-white/25 transition-colors">
-              {t({ ko: '무료로 시작하기', en: 'Get Started Free' })} →
+              {t({ ko: '무료로 시작하기 →', en: 'Get Started Free →' })}
             </a>
           </div>
         </div>
@@ -62,21 +84,26 @@ function Hero() {
 
       {/* 슬라이드 네비 */}
       <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 items-center gap-6">
-        <button type="button" aria-label="이전" onClick={() => go(-1)}
+        <button type="button"
+          aria-label={t({ ko: '이전', en: 'Previous' })}
+          onClick={() => go(-1)}
           className="flex h-9 w-9 items-center justify-center rounded-full
                      border border-white/40 text-white hover:bg-white/20 transition">
           ‹
         </button>
         <div className="flex gap-2">
           {heroSlides.map((_, i) => (
-            <button key={i} type="button" aria-label={`슬라이드 ${i + 1}`}
+            <button key={i} type="button"
+              aria-label={t({ ko: `슬라이드 ${i + 1}`, en: `Slide ${i + 1}` })}
               onClick={() => setIdx(i)}
               className={['h-1.5 rounded-full transition-all',
                 i === idx ? 'w-8 bg-white' : 'w-2 bg-white/40'].join(' ')}
             />
           ))}
         </div>
-        <button type="button" aria-label="다음" onClick={() => go(1)}
+        <button type="button"
+          aria-label={t({ ko: '다음', en: 'Next' })}
+          onClick={() => go(1)}
           className="flex h-9 w-9 items-center justify-center rounded-full
                      border border-white/40 text-white hover:bg-white/20 transition">
           ›
@@ -86,37 +113,52 @@ function Hero() {
   )
 }
 
+// ─── Services ────────────────────────────────────────────────────────────────
 function Services() {
   const { t, lang } = useLang()
   return (
     <section className="py-24 md:py-32 bg-white dark:bg-gray-950 transition-colors">
       <div className="mx-auto max-w-container section-x">
         <div className="mb-14 text-center">
-          <span className="badge mb-3">{lang === 'ko' ? '학습 서비스' : 'Services'}</span>
+          <span className="badge mb-3">{t({ ko: '학습 서비스', en: 'Services' })}</span>
           <h2 className="text-4xl font-extrabold text-brand-navy dark:text-white md:text-5xl">
             {lang === 'ko'
-              ? <><>취약점을 분석하고,</><br className="hidden sm:block" /> 합격을 설계합니다</>
-              : <><>Diagnose your weak points,</><br className="hidden sm:block" /> design your path to success.</>}
+              ? <><span>취약점을 분석하고,</span><br className="hidden sm:block" /><span>합격을 설계합니다</span></>
+              : <><span>Diagnose your weak points,</span><br className="hidden sm:block" /><span>design your path to success.</span></>}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {serviceCards.map((s) => (
             <Link key={s.key} to={s.to}
-              className="card group p-8 hover:shadow-lg hover:-translate-y-1 transition-all">
-              <div className="mb-5 text-5xl">{s.icon}</div>
-              <h3 className="mb-3 text-2xl font-bold text-brand-navy dark:text-white group-hover:text-brand-royal dark:group-hover:text-brand-sky transition-colors">
-                {t(s.title)}
-              </h3>
-              <p className="mb-5 text-sm leading-7 text-neutral-600 dark:text-neutral-400">{t(s.desc)}</p>
-              <div className="flex flex-wrap gap-2">
-                {s.tags.map((tag) => (
-                  <span key={tag} className="badge text-xs">{tag}</span>
-                ))}
+              className="card group overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
+              {/* 에디토리얼 이미지 헤더 */}
+              <div className="relative h-52 overflow-hidden">
+                <img
+                  src={SERVICE_IMG[s.key] ?? SERVICE_IMG.subjects}
+                  alt={t(s.title)}
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0
+                             group-hover:scale-105 transition-all duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/70 via-transparent to-transparent" />
+                <div className="absolute bottom-3 left-4 flex items-center gap-2">
+                  <span className="text-2xl">{s.icon}</span>
+                  <span className="text-white text-sm font-bold tracking-wide">{t(s.title)}</span>
+                </div>
               </div>
-              <div className="mt-6 flex items-center gap-2 text-sm font-semibold
-                              text-brand-royal dark:text-brand-sky group-hover:gap-3 transition-all">
-                {lang === 'ko' ? '자세히 보기' : 'Learn more'} <span>→</span>
+              <div className="p-7 flex flex-col flex-1">
+                <p className="mb-5 text-sm leading-7 text-neutral-600 dark:text-neutral-400 flex-1">
+                  {t(s.desc)}
+                </p>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {s.tags.map((tag) => (
+                    <span key={tag} className="badge text-xs">{tag}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-sm font-semibold
+                                text-brand-royal dark:text-brand-sky group-hover:gap-3 transition-all">
+                  {t({ ko: '자세히 보기', en: 'Learn more' })} <span>→</span>
+                </div>
               </div>
             </Link>
           ))}
@@ -126,7 +168,9 @@ function Services() {
   )
 }
 
+// ─── AI Band ─────────────────────────────────────────────────────────────────
 function AIBand() {
+  const { t, lang } = useLang()
   return (
     <section className="relative overflow-hidden
                         bg-gradient-to-r from-brand-navy to-brand-royal
@@ -140,22 +184,28 @@ function AIBand() {
       />
       <div className="relative mx-auto max-w-container section-x">
         <div className="max-w-2xl">
-          <span className="badge mb-4 border-brand-sky/30 bg-brand-sky/10 text-brand-sky">AI 학습 기술</span>
+          <span className="badge mb-4 border-brand-sky/30 bg-brand-sky/10 text-brand-sky">
+            {t({ ko: 'AI 학습 기술', en: 'AI Technology' })}
+          </span>
           <h2 className="mb-6 text-4xl font-extrabold leading-tight text-white md:text-5xl">
-            AI가 내 취약점을<br />정밀하게 분석합니다
+            {lang === 'ko'
+              ? <>AI가 내 취약점을<br />정밀하게 분석합니다</>
+              : <>AI precisely analyzes<br />your weak points</>}
           </h2>
           <p className="mb-10 text-lg leading-relaxed text-white/80">
-            에듀포커스 AI 학습앱은 학습 데이터를 분석하여 취약한 유형·단원을 자동으로 파악하고,
-            최단 경로로 목표 점수에 도달하는 맞춤 학습 루틴을 설계합니다.
+            {t({
+              ko: '에듀포커스 AI 학습앱은 학습 데이터를 분석하여 취약한 유형·단원을 자동으로 파악하고, 최단 경로로 목표 점수에 도달하는 맞춤 학습 루틴을 설계합니다.',
+              en: 'The EDUFOCUS AI app analyzes your performance data to automatically pinpoint weak types and units, then builds a personalized routine to reach your target score by the shortest path.',
+            })}
           </p>
           <div className="flex flex-wrap gap-4">
             <Link to="/ai-app" className="btn-primary text-base px-8 py-3.5">
-              AI 앱 소개 →
+              {t({ ko: 'AI 앱 소개 →', en: 'About the AI App →' })}
             </Link>
             <Link to="/videos/ai-app"
               className="inline-flex items-center gap-2 rounded-full border border-white/40
                          text-white px-8 py-3.5 text-base font-semibold hover:bg-white/10 transition-colors">
-              활용법 영상 보기 →
+              {t({ ko: '활용법 영상 보기 →', en: 'Watch How-To Videos →' })}
             </Link>
           </div>
         </div>
@@ -164,7 +214,9 @@ function AIBand() {
   )
 }
 
+// ─── Latest Videos ────────────────────────────────────────────────────────────
 function LatestVideos() {
+  const { t, lang } = useLang()
   const featured = videoTopics[0].videos.slice(0, 3)
 
   return (
@@ -172,44 +224,56 @@ function LatestVideos() {
       <div className="mx-auto max-w-container section-x">
         <div className="mb-12 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <span className="badge mb-3">최신 학습 영상</span>
+            <span className="badge mb-3">{t({ ko: '최신 학습 영상', en: 'Latest Videos' })}</span>
             <h2 className="text-3xl font-extrabold text-brand-navy dark:text-white md:text-4xl">
-              학습 TIP 동영상
+              {t({ ko: '학습 TIP 동영상', en: 'Study Tip Videos' })}
             </h2>
           </div>
           <Link to="/videos/ielts"
             className="text-sm font-semibold text-brand-royal dark:text-brand-sky hover:underline">
-            전체 영상 보기 →
+            {t({ ko: '전체 영상 보기 →', en: 'View All Videos →' })}
           </Link>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((v) => (
-            <div key={v.id} className="card overflow-hidden group">
-              <div className="aspect-video w-full bg-brand-navy/10 dark:bg-gray-800
-                              flex flex-col items-center justify-center gap-2">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full
-                                bg-brand-royal/20 dark:bg-brand-sky/20">
-                  <svg className="text-brand-royal dark:text-brand-sky ml-1" width="24" height="24"
-                    viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+          {featured.map((v, i) => (
+            <div key={v.id} className="card overflow-hidden group cursor-pointer">
+              {/* 에디토리얼 썸네일 */}
+              <div className="relative aspect-video w-full overflow-hidden">
+                <img
+                  src={VIDEO_IMG[i % VIDEO_IMG.length]}
+                  alt={v.title}
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0
+                             group-hover:scale-105 transition-all duration-500"
+                />
+                <div className="absolute inset-0 bg-brand-navy/35 flex items-center justify-center
+                                group-hover:bg-brand-navy/15 transition-colors duration-300">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full
+                                  bg-white/25 backdrop-blur-sm border border-white/50
+                                  group-hover:scale-110 transition-transform duration-300">
+                    <svg className="text-white ml-1" width="24" height="24"
+                      viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
                 </div>
-                <p className="text-xs text-neutral-400 dark:text-neutral-500">YouTube 영상 준비 중</p>
               </div>
               <div className="p-5">
                 <p className="font-semibold text-neutral-800 dark:text-neutral-200 leading-snug">{v.title}</p>
-                <p className="mt-1 text-xs text-brand-royal dark:text-brand-sky">IELTS 학습 TIP</p>
+                <p className="mt-1 text-xs text-brand-royal dark:text-brand-sky">
+                  {t({ ko: 'IELTS 학습 TIP', en: 'IELTS Study Tips' })}
+                </p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-10 flex justify-center gap-4 flex-wrap">
-          {videoTopics.map((t) => (
-            <Link key={t.key} to={t.to}
+        <div className="mt-10 flex justify-center gap-3 flex-wrap">
+          {videoTopics.map((topic) => (
+            <Link key={topic.key} to={topic.to}
               className="btn-outline text-xs px-5 py-2">
-              {t.label} 영상
+              {typeof topic.label === 'object' ? t(topic.label) : topic.label}
+              {lang === 'ko' ? ' 영상' : ' Videos'}
             </Link>
           ))}
         </div>
@@ -218,20 +282,22 @@ function LatestVideos() {
   )
 }
 
+// ─── Notices ─────────────────────────────────────────────────────────────────
 function Notices() {
+  const { t } = useLang()
   return (
     <section className="py-24 md:py-32 bg-white dark:bg-gray-950 transition-colors">
       <div className="mx-auto max-w-container section-x">
         <div className="mb-12 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <span className="badge mb-3">소식</span>
+            <span className="badge mb-3">{t({ ko: '소식', en: 'News' })}</span>
             <h2 className="text-3xl font-extrabold text-brand-navy dark:text-white md:text-4xl">
-              공지사항
+              {t({ ko: '공지사항', en: 'Announcements' })}
             </h2>
           </div>
           <Link to="/support"
             className="text-sm font-semibold text-brand-royal dark:text-brand-sky hover:underline">
-            전체보기 →
+            {t({ ko: '전체보기 →', en: 'View All →' })}
           </Link>
         </div>
 
@@ -243,7 +309,7 @@ function Notices() {
                            hover:text-brand-royal dark:hover:text-brand-sky
                            sm:flex-row sm:items-center">
                 <span className="font-semibold text-neutral-800 dark:text-neutral-200 md:text-lg">
-                  {n.title}
+                  {typeof n.title === 'object' ? t(n.title) : n.title}
                 </span>
                 <span className="text-sm text-neutral-400 dark:text-neutral-500">{n.date}</span>
               </Link>
@@ -255,6 +321,7 @@ function Notices() {
   )
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   return (
     <>
