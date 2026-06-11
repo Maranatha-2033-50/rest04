@@ -4,8 +4,18 @@ import { serviceCards, notices, videoTopics, heroSlides } from '../data/site'
 import { useLang } from '../context/LanguageContext'
 
 // ─── Editorial images — natural light, minimal studio (Unsplash) ────────────
-const HERO_BG =
-  'https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1920&q=80'
+// 모든 이미지는 흑백(grayscale) 처리 후 브랜드 블루 듀오톤 오버레이를 덮어
+// 흰색 텍스트·파란 버튼 UI와 색상이 충돌하지 않는 '배경색' 역할을 한다.
+
+// 히어로 슬라이드 3종 — 각 슬라이드 카피 톤앤매너에 맞춘 에디토리얼 컷
+const HERO_IMG = [
+  // 슬라이드 1 (AI 취약점 분석) — 집중하는 미니멀 학습자, 분석적 자연광 무드
+  'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1920&q=80',
+  // 슬라이드 2 (어학시험 IELTS·DELF) — 교재를 보며 생각에 잠긴 학습자
+  'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1920&q=80',
+  // 슬라이드 3 (자격증·교과 과외) — 정돈된 학습 책상과 도구, 차분한 무드
+  'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=1920&q=80',
+]
 
 const SERVICE_IMG = {
   languages:      'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=80',
@@ -18,6 +28,9 @@ const VIDEO_IMG = [
   'https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=600&q=80',
   'https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?auto=format&fit=crop&w=600&q=80',
 ]
+
+// 브랜드 블루 듀오톤 오버레이 — grayscale 이미지 위에 곱하기 블렌드로 파란 톤 부여
+const DUOTONE = 'absolute inset-0 bg-brand-royal/55 mix-blend-multiply pointer-events-none'
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
 function Hero() {
@@ -34,14 +47,16 @@ function Hero() {
 
   return (
     <section className="relative min-h-[calc(100vh-5rem)] w-full overflow-hidden flex items-center">
-      {/* 에디토리얼 배경 이미지 */}
+      {/* 슬라이드별 배경 이미지 — 흑백 처리(원본 색상 제거) */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('${HERO_BG}')` }}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat grayscale transition-[background-image] duration-700"
+        style={{ backgroundImage: `url('${HERO_IMG[idx % HERO_IMG.length]}')` }}
       />
-      {/* 그라디언트 오버레이 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-brand-navy/96 via-brand-royal/88 to-brand-sky/70
-                      dark:from-gray-950/97 dark:via-brand-navy/92 dark:to-brand-royal/82" />
+      {/* 브랜드 블루 듀오톤 — 이미지를 파란 필터로 통과시킴 */}
+      <div className="absolute inset-0 bg-brand-royal/60 mix-blend-multiply" />
+      {/* 가독성 그라디언트 — 텍스트가 놓이는 좌측을 짙게 처리 */}
+      <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/90 via-brand-navy/60 to-brand-royal/25
+                      dark:from-gray-950/95 dark:via-brand-navy/75 dark:to-brand-royal/45" />
       {/* 도트 패턴 */}
       <div className="absolute inset-0 opacity-10"
         style={{
@@ -137,10 +152,14 @@ function Services() {
                 <img
                   src={SERVICE_IMG[s.key] ?? SERVICE_IMG.subjects}
                   alt={t(s.title)}
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0
-                             group-hover:scale-105 transition-all duration-500"
+                  className="w-full h-full object-cover grayscale
+                             group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/70 via-transparent to-transparent" />
+                {/* 브랜드 블루 듀오톤 (hover 시 살짝 밝아짐) */}
+                <div className="absolute inset-0 bg-brand-royal/55 mix-blend-multiply
+                                group-hover:bg-brand-royal/35 transition-colors duration-500 pointer-events-none" />
+                {/* 하단 라벨 가독성 그라디언트 */}
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/80 via-brand-navy/10 to-transparent" />
                 <div className="absolute bottom-3 left-4 flex items-center gap-2">
                   <span className="text-2xl">{s.icon}</span>
                   <span className="text-white text-sm font-bold tracking-wide">{t(s.title)}</span>
@@ -243,11 +262,13 @@ function LatestVideos() {
                 <img
                   src={VIDEO_IMG[i % VIDEO_IMG.length]}
                   alt={t(v.title)}
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0
-                             group-hover:scale-105 transition-all duration-500"
+                  className="w-full h-full object-cover grayscale
+                             group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-brand-navy/35 flex items-center justify-center
-                                group-hover:bg-brand-navy/15 transition-colors duration-300">
+                {/* 브랜드 블루 듀오톤 */}
+                <div className={DUOTONE} />
+                <div className="absolute inset-0 bg-brand-navy/30 flex items-center justify-center
+                                group-hover:bg-brand-navy/10 transition-colors duration-300">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full
                                   bg-white/25 backdrop-blur-sm border border-white/50
                                   group-hover:scale-110 transition-transform duration-300">
