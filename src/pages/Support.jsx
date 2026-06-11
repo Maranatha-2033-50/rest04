@@ -65,19 +65,60 @@ export default function Support() {
     setSubmitError(null)
     setSubmitting(true)
 
-    const { error } = await supabase.from('inquiries').insert({
-      name: form.name.trim(),
-      email: form.email.trim(),
-      type: form.type,
-      title: form.subject.trim(),
+    const payload = {
+      name:    form.name.trim(),
+      email:   form.email.trim(),
+      type:    form.type,
+      title:   form.subject.trim(),
       content: form.message.trim(),
-    })
+    }
+
+    const { error } = await supabase.from('inquiries').insert(payload)
 
     setSubmitting(false)
 
     if (error) {
       setSubmitError('문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
       return
+    }
+
+    // Slack 실시간 알림 (VITE_SLACK_WEBHOOK_URL 설정 시 동작)
+    const webhookUrl = import.meta.env.VITE_SLACK_WEBHOOK_URL
+    if (webhookUrl) {
+      const typeLabel = {
+        languages:      '어학',
+        certifications: '자격증',
+        subjects:       '교과목 과외',
+        'ai-app':       'AI 학습앱',
+        system:         '시스템 및 기타',
+      }[payload.type] ?? payload.type
+
+      fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: '*[에듀포커스 상담신청]*',
+          blocks: [
+            {
+              type: 'header',
+              text: { type: 'plain_text', text: '📬 새 상담 신청이 접수되었습니다', emoji: true },
+            },
+            {
+              type: 'section',
+              fields: [
+                { type: 'mrkdwn', text: `*이름*\n${payload.name}` },
+                { type: 'mrkdwn', text: `*이메일*\n${payload.email}` },
+                { type: 'mrkdwn', text: `*문의 유형*\n${typeLabel}` },
+                { type: 'mrkdwn', text: `*제목*\n${payload.title}` },
+              ],
+            },
+            {
+              type: 'section',
+              text: { type: 'mrkdwn', text: `*내용*\n${payload.content}` },
+            },
+          ],
+        }),
+      }).catch(() => { /* 알림 실패가 메인 흐름에 영향 없도록 */ })
     }
 
     setSubmitted(true)

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { nav, company, studyMateApp } from '../data/site'
 import { useLang } from '../context/LanguageContext'
-import { supabase } from '../lib/supabaseClient'
 
 function SunIcon() {
   return (
@@ -23,20 +22,22 @@ function MoonIcon() {
 
 export default function Header() {
   const { lang, toggleLang, t } = useLang()
-  const [session, setSession] = useState(null)
+  const [efLoggedIn, setEfLoggedIn] = useState(() => localStorage.getItem('ef_logged_in') === 'true')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hoveredIdx, setHoveredIdx] = useState(null)
   const [dark, setDark] = useState(() =>
     document.documentElement.classList.contains('dark')
   )
 
+  // 크로스 도메인 세션 브릿지: 스터디메이트 로그인 후 ?login_status=success 감지
   useEffect(() => {
-    if (!supabase) return
-    supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-    return () => subscription.unsubscribe()
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('login_status') === 'success') {
+      localStorage.setItem('ef_logged_in', 'true')
+      setEfLoggedIn(true)
+      // URL 정리 — 쿼리 파라미터 제거 후 해시만 유지
+      window.history.replaceState({}, '', window.location.pathname + window.location.hash)
+    }
   }, [])
 
   useEffect(() => {
@@ -49,10 +50,10 @@ export default function Header() {
     }
   }, [dark])
 
-  async function handleSignOut() {
-    if (!supabase) return
-    await supabase.auth.signOut()
-    setSession(null)
+  function handleSignOut() {
+    localStorage.removeItem('ef_logged_in')
+    setEfLoggedIn(false)
+    window.location.href = studyMateApp.signoutUrl
   }
 
   const myPageLabel = lang === 'ko' ? '마이페이지' : 'My Page'
@@ -125,7 +126,7 @@ export default function Header() {
           {/* 우측: 인증 버튼 + 언어 토글 + 다크모드 토글 + 햄버거 */}
           <div className="flex items-center gap-2">
             {/* 로그인 상태에 따라 버튼 동적 전환 — 데스크탑만 */}
-            {session ? (
+            {efLoggedIn ? (
               <>
                 <a href={studyMateApp.url}
                   className="hidden lg:inline-flex items-center rounded-full border border-gray-200
@@ -247,7 +248,7 @@ export default function Header() {
 
             {/* 모바일 인증 버튼 */}
             <div className="mb-6 flex gap-3">
-              {session ? (
+              {efLoggedIn ? (
                 <>
                   <a href={studyMateApp.url}
                     className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700

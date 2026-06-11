@@ -36,6 +36,7 @@ export const studyMateApp = {
   url: 'https://study-mate-nine-phi.vercel.app',
   loginUrl: `https://study-mate-nine-phi.vercel.app/login?next=${EDUFOCUS_ORIGIN}`,
   signupUrl: `https://study-mate-nine-phi.vercel.app/signup?next=${EDUFOCUS_ORIGIN}`,
+  signoutUrl: `https://study-mate-nine-phi.vercel.app/auth/signout?next=${EDUFOCUS_ORIGIN}`,
   label: { ko: 'Study Mate 앱 바로가기', en: 'Go to Study Mate App' },
 }
 
