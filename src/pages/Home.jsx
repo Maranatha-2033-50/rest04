@@ -152,12 +152,12 @@ function Services() {
                 <img
                   src={SERVICE_IMG[s.key] ?? SERVICE_IMG.subjects}
                   alt={t(s.title)}
-                  className="w-full h-full object-cover grayscale
-                             group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0
+                             group-hover:scale-105 transition-all duration-500"
                 />
-                {/* 브랜드 블루 듀오톤 (hover 시 살짝 밝아짐) */}
+                {/* 브랜드 블루 듀오톤 (hover 시 사라져 원본 컬러 노출) */}
                 <div className="absolute inset-0 bg-brand-royal/55 mix-blend-multiply
-                                group-hover:bg-brand-royal/35 transition-colors duration-500 pointer-events-none" />
+                                group-hover:opacity-0 transition-opacity duration-500 pointer-events-none" />
                 {/* 하단 라벨 가독성 그라디언트 */}
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/80 via-brand-navy/10 to-transparent" />
                 <div className="absolute bottom-3 left-4 flex items-center gap-2">
@@ -262,11 +262,11 @@ function LatestVideos() {
                 <img
                   src={VIDEO_IMG[i % VIDEO_IMG.length]}
                   alt={t(v.title)}
-                  className="w-full h-full object-cover grayscale
-                             group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0
+                             group-hover:scale-105 transition-all duration-500"
                 />
-                {/* 브랜드 블루 듀오톤 */}
-                <div className={DUOTONE} />
+                {/* 브랜드 블루 듀오톤 (hover 시 사라져 원본 컬러 노출) */}
+                <div className={`${DUOTONE} group-hover:opacity-0 transition-opacity duration-500`} />
                 <div className="absolute inset-0 bg-brand-navy/30 flex items-center justify-center
                                 group-hover:bg-brand-navy/10 transition-colors duration-300">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full
