@@ -14,7 +14,6 @@ const ui = {
   },
   selectMenu: { ko: '📋 메뉴를 선택해 주세요', en: '📋 Choose a menu' },
   selectFinal: { ko: '✨ 다음 단계를 선택해 주세요', en: '✨ Choose your next step' },
-  branchFollow: { ko: '아래 메뉴에서 세부 항목을 선택해 주세요 👇', en: 'Please choose a detailed option below 👇' },
   freeConsult: {
     ko: '무료 상담 신청 감사합니다! 전문 컨설턴트가 빠르게 도와드릴 수 있도록 고객센터(02-1234-5678) 또는 상단 메뉴의 고객센터 페이지로 연락 부탁드립니다. 원하시면 지금 바로 AI 실시간 상담도 가능합니다 😊',
     en: 'Thanks for requesting a free consultation! For the fastest help, please reach our support center (02-1234-5678) or the Support page in the top menu. You can also start a live AI chat right now 😊',
@@ -31,7 +30,6 @@ const ui = {
     en: 'Log in to use the live AI consultation for free.',
   },
   googleLogin: { ko: '구글로 로그인', en: 'Sign in with Google' },
-  naverLogin: { ko: '네이버로 로그인', en: 'Sign in with Naver' },
   kakaoLogin: { ko: '카카오로 로그인', en: 'Sign in with Kakao' },
   open: { ko: 'AI 상담 챗봇 열기', en: 'Open AI chatbot' },
   close: { ko: '챗봇 닫기', en: 'Close chatbot' },
@@ -47,6 +45,10 @@ const FINAL_ACTIONS = [
   { id: 'ai', action: 'ai', label: { ko: '✨ AI와 실시간 상담하기', en: '✨ Start live AI chat' } },
   { id: 'free', action: 'free', label: { ko: '📞 전문가와 무료 상담 신청', en: '📞 Request a free expert consultation' } },
 ]
+
+// 내비게이션 특수 옵션 — 드롭다운 최하단에 상태에 따라 결합.
+const BACK_OPTION = { id: '__back', action: 'back', label: { ko: '↩ 이전 단계로 돌아가기', en: '↩ Go back to the previous step' } }
+const RESTART_OPTION = { id: '__restart', action: 'restart', label: { ko: '🔄 처음부터 다시 물어보기', en: '🔄 Start over from the beginning' } }
 
 // 관심사별 4단계 FAQ 트리: 1) 고객 분류 → 2) 상세 분류 → 3) 핵심 답변 → 4) 최종 전환.
 const FAQ_TREE = [
@@ -134,6 +136,7 @@ export default function ChatbotPopup() {
   const [mounted, setMounted] = useState(false) // 슬라이드업/페이드인 전환용
   const [mode, setMode] = useState('faq') // 'faq' | 'auth' | 'ai'
   const [options, setOptions] = useState(FAQ_TREE) // 현재 드롭다운 선택지
+  const [history, setHistory] = useState([]) // 역방향 내비게이션 스냅샷 스택
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -163,6 +166,26 @@ export default function ChatbotPopup() {
   // 드롭다운 선택 — 선택 시에만 대화가 누적된다.
   function selectOption(opt) {
     setDropdownOpen(false)
+
+    // 이전 단계로 롤백 — 직전 depth의 옵션과 대화 상태를 복원.
+    if (opt.action === 'back') {
+      const snap = history[history.length - 1]
+      if (snap) {
+        setOptions(snap.options)
+        setMessages((prev) => prev.slice(0, snap.messageCount))
+        setHistory((prev) => prev.slice(0, -1))
+        setDropdownOpen(true)
+      }
+      return
+    }
+    // 처음부터 다시 — 1단계 카테고리 상태로 완전 초기화.
+    if (opt.action === 'restart') {
+      setMode('faq')
+      setOptions(FAQ_TREE)
+      setHistory([])
+      setMessages([{ role: 'assistant', content: tt(ui.greeting) }])
+      return
+    }
     if (opt.action === 'ai') {
       enterAiConsult(opt)
       return
@@ -176,13 +199,22 @@ export default function ChatbotPopup() {
       setOptions(FINAL_ACTIONS)
       return
     }
-    // 일반 트리 노드: 답변(리프) 또는 하위 메뉴 안내(분기)
-    setMessages((prev) => [
-      ...prev,
-      { role: 'user', content: tt(opt.label) },
-      { role: 'assistant', content: opt.answer ? tt(opt.answer) : tt(ui.branchFollow) },
-    ])
-    setOptions(opt.children ? opt.children : FINAL_ACTIONS)
+
+    if (opt.answer) {
+      // 리프 노드 = 여정의 최종 단계 → 답변 출력 후 최종 액션만 매핑.
+      setMessages((prev) => [
+        ...prev,
+        { role: 'user', content: tt(opt.label) },
+        { role: 'assistant', content: tt(opt.answer) },
+      ])
+      setOptions(FINAL_ACTIONS)
+    } else {
+      // 분기 노드 → 중간 안내 텍스트 없이 곧바로 하위 옵션으로 이어준다.
+      setHistory((prev) => [...prev, { options, messageCount: messages.length }])
+      setMessages((prev) => [...prev, { role: 'user', content: tt(opt.label) }])
+      setOptions(opt.children)
+      setDropdownOpen(true)
+    }
   }
 
   // AI 실시간 상담 진입 — 로그인 게이트 작동.
@@ -343,6 +375,25 @@ export default function ChatbotPopup() {
                       {tt(opt.label)}
                     </button>
                   ))}
+
+                  {/* 최종 단계: 처음부터 다시 / 중간 단계: 이전 단계로 (연한 스타일로 구분) */}
+                  {isFinal ? (
+                    <button
+                      type="button"
+                      onClick={() => selectOption(RESTART_OPTION)}
+                      className="mt-1 block w-full border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 px-4 py-2.5 text-left text-sm text-gray-400 dark:text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      {tt(RESTART_OPTION.label)}
+                    </button>
+                  ) : history.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => selectOption(BACK_OPTION)}
+                      className="mt-1 block w-full border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 px-4 py-2.5 text-left text-sm text-gray-400 dark:text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      {tt(BACK_OPTION.label)}
+                    </button>
+                  ) : null}
                 </div>
               )}
               <button
@@ -382,14 +433,6 @@ export default function ChatbotPopup() {
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z" />
                   </svg>
                   {tt(ui.googleLogin)}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleOAuth('naver')}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#03C75A] px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-95"
-                >
-                  <span className="font-extrabold">N</span>
-                  {tt(ui.naverLogin)}
                 </button>
                 <button
                   type="button"
