@@ -3,21 +3,22 @@ import { supabase } from '../lib/supabaseClient'
 import { useLang } from '../context/LanguageContext'
 
 // 에듀포커스 AI 상담 챗봇 — 프리미엄 관리형 ARS 퍼널.
-// ① 단계형 FAQ 트리(드롭다운·무비용) → ② AI 실시간 상담(로그인 게이트 → Edge Function).
+// ① 4단계 FAQ 트리(드롭다운·무비용) → ② AI 실시간 상담(로그인 게이트) / 전문가 1:1 무료 상담(상담 신청 페이지 연동).
 const ui = {
   title: { ko: 'AI 학습 컨설턴트', en: 'AI Learning Consultant' },
-  subtitle: { ko: '에듀포커스 · 온라인 상담', en: 'EDUFOCUS · Online' },
+  subtitle: { ko: '에듀포커스 · 프리미엄 상담', en: 'EDUFOCUS · Premium' },
   fabLabel: { ko: 'AI 학습 컨설턴트와 맞춤형 상담', en: 'Chat with our AI consultant' },
   greeting: {
-    ko: '안녕하세요! 에듀포커스 AI 학습 컨설턴트입니다 😊\n아래 메뉴에서 궁금하신 주제를 선택해 주세요. 단계별로 가장 정확한 답변을 안내해 드립니다.',
-    en: "Hi! I'm the EDUFOCUS AI learning consultant 😊\nPick a topic from the menu below — I'll guide you step by step to the most accurate answer.",
+    ko: '안녕하세요, 에듀포커스 수석 학습 컨설턴트입니다 😊\n아래 메뉴에서 관심 분야를 선택해 주시면, 단계별로 가장 정확한 솔루션을 안내해 드리겠습니다.',
+    en: "Hello, I'm the EDUFOCUS lead learning consultant 😊\nSelect your area of interest below and I'll guide you, step by step, to the most precise solution.",
   },
   selectMenu: { ko: '📋 메뉴를 선택해 주세요', en: '📋 Choose a menu' },
   selectFinal: { ko: '✨ 다음 단계를 선택해 주세요', en: '✨ Choose your next step' },
   freeConsult: {
-    ko: '무료 상담 신청 감사합니다! 전문 컨설턴트가 빠르게 도와드릴 수 있도록 고객센터(02-1234-5678) 또는 상단 메뉴의 고객센터 페이지로 연락 부탁드립니다. 원하시면 지금 바로 AI 실시간 상담도 가능합니다 😊',
-    en: 'Thanks for requesting a free consultation! For the fastest help, please reach our support center (02-1234-5678) or the Support page in the top menu. You can also start a live AI chat right now 😊',
+    ko: '성함과 연락처, 문의사항을 남겨주시면 24시간 내로 연락 드리겠습니다.',
+    en: 'Leave your name, contact, and question, and our team will reach out within 24 hours.',
   },
+  consultCta: { ko: '📋 무료 상담 신청 페이지로 이동', en: '📋 Go to the consultation form' },
   placeholder: { ko: '메시지를 입력하세요...', en: 'Type a message...' },
   typing: { ko: 'AI 컨설턴트가 답변을 입력 중입니다...', en: 'AI consultant is typing...' },
   aiSwitch: {
@@ -43,90 +44,70 @@ const ui = {
 // 최종 전환 노드 — 모든 여정의 끝단에 결합되는 두 가지 액션.
 const FINAL_ACTIONS = [
   { id: 'ai', action: 'ai', label: { ko: '✨ AI와 실시간 상담하기', en: '✨ Start live AI chat' } },
-  { id: 'free', action: 'free', label: { ko: '📞 전문가와 무료 상담 신청', en: '📞 Request a free expert consultation' } },
+  { id: 'free', action: 'free', label: { ko: '📞 전문가와 1:1 무료 상담 신청', en: '📞 Request a 1:1 free expert consultation' } },
 ]
 
 // 내비게이션 특수 옵션 — 드롭다운 최하단에 상태에 따라 결합.
 const BACK_OPTION = { id: '__back', action: 'back', label: { ko: '↩ 이전 단계로 돌아가기', en: '↩ Go back to the previous step' } }
 const RESTART_OPTION = { id: '__restart', action: 'restart', label: { ko: '🔄 처음부터 다시 물어보기', en: '🔄 Start over from the beginning' } }
 
-// 관심사별 4단계 FAQ 트리: 1) 고객 분류 → 2) 상세 분류 → 3) 핵심 답변 → 4) 최종 전환.
+// 3단계 공통 해결 질문 — 모든 세부 트랙에서 동일하게 분기되는 핵심 질문 2종.
+const COMMON_QUESTIONS = [
+  {
+    id: 'SYS',
+    label: {
+      ko: '여타 인강과 다른 에듀포커스 AI 시스템(오답 지우개·플래너)의 관리 방식은?',
+      en: 'How does the EDUFOCUS AI system (wrong-answer eraser · planner) manage learning differently from typical online lectures?',
+    },
+    answer: {
+      ko: '에듀포커스 AI 시스템은 일방향 인강과 근본적으로 다릅니다. ‘오답 지우개’가 틀린 문항의 취약 유형을 자동 분류하고, AI 플래너가 목표일까지 최단 경로의 개인별 학습 플랜을 설계하고 매일 갱신합니다. 망각 곡선 기반 복습 알림과 주간 성취도 리포트로, 학습이 방치되지 않고 끝까지 밀착 관리되는 경험을 제공합니다.',
+      en: 'Unlike one-way video lectures, the EDUFOCUS AI system auto-classifies your weak question types with the “wrong-answer eraser,” while the AI planner designs and updates a personalized study plan along the shortest path to your goal date. Forgetting-curve review reminders and weekly progress reports ensure your learning is managed closely, end to end.',
+    },
+  },
+  {
+    id: 'PRC',
+    label: {
+      ko: '1:1 밀착 매니징 컨설팅 프로그램의 구체적인 비용과 절차는?',
+      en: 'What are the exact cost and process of the 1:1 managed consulting program?',
+    },
+    answer: {
+      ko: '1:1 밀착 매니징 컨설팅은 ① 무료 취약점 진단 → ② 전담 컨설턴트의 영역별 분석 리포트 → ③ 목표·기간 맞춤 학습 플랜 설계 → ④ 주간 점검 및 리포트의 순서로 진행됩니다. 수강료는 과정·기간·관리 범위에 따라 차등 책정되며, 정확한 견적은 무료 상담을 통해 1:1로 정밀하게 안내해 드립니다.',
+      en: 'The 1:1 managed consulting runs as: ① free weak-point diagnosis → ② a dedicated consultant’s skill-by-skill report → ③ a goal/timeline-tailored study plan → ④ weekly check-ins and reports. Tuition varies by program, duration, and management scope; we provide an exact 1:1 quote during your free consultation.',
+    },
+  },
+]
+
+// 정제된 4단계 마스터 FAQ 트리: 1) 고객 분류 → 2) 세부 트랙 → 3) 공통 질문 → 4) 핵심 답변.
+// 세부 트랙(Depth 2) 노드의 intent 는 무료 상담 페이지(/#/consultation?intent=...) 도메인 값과 매핑된다.
 const FAQ_TREE = [
   {
-    id: 'interest',
-    label: { ko: '🎯 관심 분야별 탐색', en: '🎯 Explore by field of interest' },
+    id: 'academic',
+    label: { ko: '🏫 1등급·글로벌 명문대 — 내신·수능 및 국내외 교과', en: '🏫 Top grades & elite universities — school & CSAT prep' },
     children: [
-      {
-        id: 'cert',
-        label: { ko: '국가 자격증 단기 합격', en: 'Fast-track national certifications' },
-        answer: {
-          ko: '에듀포커스는 컴퓨터활용능력(1·2급), 정보처리기사(필기·실기), 한국사능력검정(심화·기본)을 AI 취약점 분석으로 공략합니다. 진단 → 취약 단원 분석 리포트 → 기출 유형 반복 훈련 → 모의고사 피드백으로 이어지는 단기 합격 루틴을 제공합니다.',
-          en: 'EDUFOCUS targets Computer Applications (L1·L2), IT Engineer (written·practical), and Korean History exams with AI weak-point analysis: diagnosis → weak-unit report → repeated past-exam drills → mock-test feedback — a fast-track pass routine.',
-        },
-      },
-      {
-        id: 'language',
-        label: { ko: '글로벌 어학 자격', en: 'Global language certifications' },
-        answer: {
-          ko: 'IELTS와 DELF A1~C2 전 레벨을 영역별(Listening·Reading·Writing·Speaking)로 정밀 진단하고, 목표 점수 달성을 위한 맞춤 학습 루틴과 정기 모의시험·점수 예측 피드백을 제공합니다.',
-          en: 'We precisely diagnose IELTS and DELF A1–C2 across all skills (Listening·Reading·Writing·Speaking), then build a tailored routine with regular mock tests and predicted-score feedback to hit your target.',
-        },
-      },
-      {
-        id: 'tutoring',
-        label: { ko: '국내외 맞춤 교과 과외', en: 'Domestic & overseas subject tutoring' },
-        answer: {
-          ko: '영어·수학·과학·국어 핵심 교과의 취약 단원을 진단해 1:1 맞춤 보완 학습을 제공합니다. 내신·수능은 물론 해외 교과 과정까지 학습자 수준에 맞춰 설계합니다.',
-          en: 'We diagnose weak units in English, Math, Science, and Korean for 1:1 personalized tutoring — covering school exams, CSAT, and overseas curricula tailored to each learner.',
-        },
-      },
+      { id: 'KS', intent: 'domestic', label: { ko: '대한민국 내신·수능 압도적 1등급 로드맵', en: 'Korea school & CSAT — top-grade roadmap' }, children: COMMON_QUESTIONS },
+      { id: 'UK', intent: 'a-level', label: { ko: '영국 A-Level 의대·명문대 타겟 트랙', en: 'UK A-Level — med/elite university track' }, children: COMMON_QUESTIONS },
+      { id: 'CA', intent: 'ontario', label: { ko: '캐나다 온타리오(ON) 주립대 합격 트랙', en: 'Canada Ontario (ON) — provincial university track' }, children: COMMON_QUESTIONS },
     ],
   },
   {
-    id: 'question',
-    label: { ko: '❓ 질문 종류별 탐색', en: '❓ Explore by question type' },
+    id: 'global-language',
+    label: { ko: '🇬🇧 유학·이민·취업 — 글로벌 어학(IELTS) 마스터', en: '🇬🇧 Study abroad·immigration·career — global English (IELTS)' },
     children: [
-      {
-        id: 'pricing',
-        label: { ko: '컨설팅 비용 및 수강료', en: 'Consulting cost & tuition' },
-        answer: {
-          ko: '수강료는 과정(어학·자격증·교과)·기간·1:1 컨설팅 범위에 따라 달라집니다. 무료 취약점 진단 후 맞춤 견적을 안내해 드리며, 정확한 비용은 전문가 상담을 통해 확인하실 수 있습니다.',
-          en: 'Tuition varies by program (language·certification·subjects), duration, and the scope of 1:1 consulting. We provide a tailored quote after a free weak-point diagnosis — for an exact figure, please speak with an expert.',
-        },
-      },
-      {
-        id: 'planner',
-        label: { ko: '학습 스케줄 플래너 작동 방식', en: 'How the study planner works' },
-        answer: {
-          ko: 'AI 학습 플래너는 취약점 분석 결과와 목표 시험일을 기반으로 최단 경로 학습 루틴을 자동 설계하고, 망각 곡선 기반 복습 알림으로 진도를 관리합니다. 주간 성취도 리포트로 달성률을 한눈에 확인할 수 있습니다.',
-          en: 'The AI planner auto-designs the shortest-path routine from your weak-point analysis and target exam date, manages progress with forgetting-curve review reminders, and shows your completion rate in weekly reports.',
-        },
-      },
+      { id: 'IE_1', intent: 'ielts-general', label: { ko: 'IELTS 이민·교환학생 목표 트랙', en: 'IELTS — immigration & exchange track' }, children: COMMON_QUESTIONS },
+      { id: 'IE_2', intent: 'ielts-review', label: { ko: 'IELTS Writing & Speaking 정밀 첨삭 트랙', en: 'IELTS Writing & Speaking precision review track' }, children: COMMON_QUESTIONS },
     ],
   },
   {
-    id: 'purpose',
-    label: { ko: '🚀 고객 목적별 탐색', en: '🚀 Explore by goal' },
+    id: 'credentials',
+    label: { ko: '💼 초고속 스펙 업그레이드 — 국가 핵심 IT/공기업 자격증', en: '💼 Fast-track credentials — key national IT & public-sector certifications' },
     children: [
-      {
-        id: 'grades',
-        label: { ko: '내신 성적 및 등급 업', en: 'Raise school grades & rank' },
-        answer: {
-          ko: '내신 대비는 학교별 출제 경향과 취약 단원을 진단해 집중 보완합니다. 오답 패턴 분석과 반복 훈련, 실전 유형 적용으로 등급 상승을 목표로 학습 루틴을 설계합니다.',
-          en: 'For school exams we diagnose each school’s question trends and weak units, then design a routine around wrong-answer pattern analysis, repeated drills, and real-format practice to raise your grade.',
-        },
-      },
-      {
-        id: 'study-abroad',
-        label: { ko: '글로벌 대학 진학 및 유학', en: 'Global university admission & study abroad' },
-        answer: {
-          ko: 'IELTS·DELF 등 공인 어학 성적부터 해외 교과 과정 보완까지, 목표 대학·국가에 맞춘 진학 로드맵을 설계합니다. 진학 일정을 역산한 학습 플래너로 체계적으로 준비합니다.',
-          en: 'From official language scores (IELTS·DELF) to overseas curriculum support, we design an admission roadmap tailored to your target school and country, with a planner that works backward from your application timeline.',
-        },
-      },
+      { id: 'IT', intent: 'it-cert', label: { ko: '취업 프리패스 자격증 (컴활 1급·정보처리기사)', en: 'Career fast-pass certs (Computer Apps L1 · IT Engineer)' }, children: COMMON_QUESTIONS },
+      { id: 'HS', intent: 'korean-history', label: { ko: '공기업·대기업 목표 (한국사능력검정시험)', en: 'Public/large-enterprise goal (Korean History test)' }, children: COMMON_QUESTIONS },
     ],
   },
 ]
+
+const CONSULT_BASE = `${import.meta.env.BASE_URL}#/consultation`
 
 export default function ChatbotPopup() {
   const { lang } = useLang()
@@ -138,6 +119,8 @@ export default function ChatbotPopup() {
   const [options, setOptions] = useState(FAQ_TREE) // 현재 드롭다운 선택지
   const [history, setHistory] = useState([]) // 역방향 내비게이션 스냅샷 스택
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [selectedIntent, setSelectedIntent] = useState('') // 선택한 도메인(상담 페이지 연동용)
+  const [consultHref, setConsultHref] = useState(null) // 무료 상담 CTA 링크
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState([{ role: 'assistant', content: tt(ui.greeting) }])
@@ -155,7 +138,7 @@ export default function ChatbotPopup() {
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-  }, [messages, loading, mode])
+  }, [messages, loading, mode, consultHref])
 
   useEffect(() => {
     if (open && mounted && mode === 'ai') inputRef.current?.focus()
@@ -174,6 +157,7 @@ export default function ChatbotPopup() {
         setOptions(snap.options)
         setMessages((prev) => prev.slice(0, snap.messageCount))
         setHistory((prev) => prev.slice(0, -1))
+        setConsultHref(null)
         setDropdownOpen(true)
       }
       return
@@ -183,6 +167,8 @@ export default function ChatbotPopup() {
       setMode('faq')
       setOptions(FAQ_TREE)
       setHistory([])
+      setSelectedIntent('')
+      setConsultHref(null)
       setMessages([{ role: 'assistant', content: tt(ui.greeting) }])
       return
     }
@@ -191,11 +177,13 @@ export default function ChatbotPopup() {
       return
     }
     if (opt.action === 'free') {
+      // 확신 메시지 출력 + 도메인 intent 를 실은 상담 페이지 CTA 동적 생성.
       setMessages((prev) => [
         ...prev,
         { role: 'user', content: tt(opt.label) },
         { role: 'assistant', content: tt(ui.freeConsult) },
       ])
+      setConsultHref(selectedIntent ? `${CONSULT_BASE}?intent=${selectedIntent}` : CONSULT_BASE)
       setOptions(FINAL_ACTIONS)
       return
     }
@@ -207,9 +195,11 @@ export default function ChatbotPopup() {
         { role: 'user', content: tt(opt.label) },
         { role: 'assistant', content: tt(opt.answer) },
       ])
+      setConsultHref(null)
       setOptions(FINAL_ACTIONS)
     } else {
       // 분기 노드 → 중간 안내 텍스트 없이 곧바로 하위 옵션으로 이어준다.
+      if (opt.intent) setSelectedIntent(opt.intent)
       setHistory((prev) => [...prev, { options, messageCount: messages.length }])
       setMessages((prev) => [...prev, { role: 'user', content: tt(opt.label) }])
       setOptions(opt.children)
@@ -220,6 +210,7 @@ export default function ChatbotPopup() {
   // AI 실시간 상담 진입 — 로그인 게이트 작동.
   async function enterAiConsult(opt) {
     setMessages((prev) => [...prev, { role: 'user', content: tt(opt.label) }])
+    setConsultHref(null)
     if (!supabase) {
       setMode('auth')
       return
@@ -362,6 +353,16 @@ export default function ChatbotPopup() {
           {/* 푸터: 모드별 렌더 — FAQ 드롭다운 / 로그인 게이트 / AI 입력창 */}
           {mode === 'faq' && (
             <div className="relative border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-3">
+              {/* 무료 상담 신청 CTA — free 액션 선택 시 동적 노출 */}
+              {consultHref && (
+                <a
+                  href={consultHref}
+                  className="mb-2 block w-full rounded-xl bg-brand-amber px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm transition hover:brightness-110"
+                >
+                  {tt(ui.consultCta)}
+                </a>
+              )}
+
               {/* 펼침 목록 — 위로 오버레이되어 대화를 밀어 올리지 않음 */}
               {dropdownOpen && (
                 <div className="absolute bottom-full left-3 right-3 z-20 mb-2 max-h-56 overflow-y-auto rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 py-1 shadow-xl">
@@ -419,7 +420,7 @@ export default function ChatbotPopup() {
                 <p className="text-sm font-bold text-white">{tt(ui.bannerTitle)}</p>
                 <p className="mt-1 text-[11px] text-brand-sky/90">{tt(ui.bannerSub)}</p>
               </div>
-              {/* 소셜 로그인 버튼 */}
+              {/* 소셜 로그인 버튼 — 구글 / 카카오 */}
               <div className="space-y-2">
                 <button
                   type="button"
