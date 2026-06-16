@@ -125,13 +125,6 @@ export default function Header() {
 
           {/* 우측: 인증 버튼 + 언어 토글 + 다크모드 토글 + 햄버거 */}
           <div className="flex items-center gap-2">
-            {/* 무료 상담 신청 CTA — 데스크탑 */}
-            <Link to="/consultation"
-              className="hidden lg:inline-flex items-center rounded-full bg-brand-amber px-4 py-2
-                         text-xs font-bold text-white hover:brightness-110 transition">
-              {lang === 'ko' ? '무료 상담 신청' : 'Free Consultation'}
-            </Link>
-
             {/* 로그인 상태에 따라 버튼 동적 전환 — 데스크탑만 */}
             {efLoggedIn ? (
               <>
@@ -252,14 +245,6 @@ export default function Header() {
                 </button>
               </div>
             </div>
-
-            {/* 무료 상담 신청 CTA — 모바일 */}
-            <Link to="/consultation"
-              onClick={() => setMobileOpen(false)}
-              className="mb-4 block rounded-xl bg-brand-amber py-3 text-center text-sm font-bold text-white
-                         hover:brightness-110 transition">
-              {lang === 'ko' ? '무료 상담 신청하기' : 'Apply for Free Consultation'}
-            </Link>
 
             {/* 모바일 인증 버튼 */}
             <div className="mb-6 flex gap-3">
