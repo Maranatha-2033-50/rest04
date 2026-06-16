@@ -2,28 +2,37 @@ import { useState, useRef, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useLang } from '../context/LanguageContext'
 
-// 에듀포커스 AI 상담 챗봇 — 우측 하단 플로팅 위젯.
-// 하이브리드 흐름: ① FAQ 가이드(로컬·무비용) → ② AI 실시간 상담(Edge Function 경유).
+// 에듀포커스 AI 상담 챗봇 — 프리미엄 관리형 ARS 퍼널.
+// ① 단계형 FAQ 트리(드롭다운·무비용) → ② AI 실시간 상담(로그인 게이트 → Edge Function).
 const ui = {
   title: { ko: 'AI 학습 컨설턴트', en: 'AI Learning Consultant' },
   subtitle: { ko: '에듀포커스 · 온라인 상담', en: 'EDUFOCUS · Online' },
   fabLabel: { ko: 'AI 학습 컨설턴트와 맞춤형 상담', en: 'Chat with our AI consultant' },
   greeting: {
-    ko: '안녕하세요! 에듀포커스 AI 학습 컨설턴트입니다 😊\n아래 자주 묻는 질문에서 바로 답을 확인하거나, 실시간 AI 상담을 시작해 보세요.',
-    en: "Hi! I'm the EDUFOCUS AI learning consultant 😊\nPick a question below for an instant answer, or start a live AI chat.",
+    ko: '안녕하세요! 에듀포커스 AI 학습 컨설턴트입니다 😊\n아래 메뉴에서 궁금하신 주제를 선택해 주세요. 단계별로 가장 정확한 답변을 안내해 드립니다.',
+    en: "Hi! I'm the EDUFOCUS AI learning consultant 😊\nPick a topic from the menu below — I'll guide you step by step to the most accurate answer.",
   },
-  faqHeading: { ko: '💡 자주 묻는 질문', en: '💡 Frequently asked' },
-  guidePlaceholder: {
-    ko: '먼저 자주 묻는 질문을 선택해 주세요',
-    en: 'Pick a frequently asked question first',
+  selectMenu: { ko: '📋 메뉴를 선택해 주세요', en: '📋 Choose a menu' },
+  selectFinal: { ko: '✨ 다음 단계를 선택해 주세요', en: '✨ Choose your next step' },
+  branchFollow: { ko: '아래 메뉴에서 세부 항목을 선택해 주세요 👇', en: 'Please choose a detailed option below 👇' },
+  freeConsult: {
+    ko: '무료 상담 신청 감사합니다! 전문 컨설턴트가 빠르게 도와드릴 수 있도록 고객센터(02-1234-5678) 또는 상단 메뉴의 고객센터 페이지로 연락 부탁드립니다. 원하시면 지금 바로 AI 실시간 상담도 가능합니다 😊',
+    en: 'Thanks for requesting a free consultation! For the fastest help, please reach our support center (02-1234-5678) or the Support page in the top menu. You can also start a live AI chat right now 😊',
   },
   placeholder: { ko: '메시지를 입력하세요...', en: 'Type a message...' },
   typing: { ko: 'AI 컨설턴트가 답변을 입력 중입니다...', en: 'AI consultant is typing...' },
-  aiCta: { ko: '✨ AI와 실시간 상담하기', en: '✨ Start live AI chat' },
   aiSwitch: {
     ko: '실시간 AI 상담 모드로 전환되었습니다. 궁금하신 점을 자유롭게 입력해 주세요 😊',
     en: 'Switched to live AI chat. Feel free to type your question 😊',
   },
+  bannerTitle: { ko: '진행하기 위해서 로그인하고 무료상담하기', en: 'Log in to continue and get a free consultation' },
+  bannerSub: {
+    ko: '로그인하시면 AI 실시간 상담을 무료로 이용하실 수 있어요.',
+    en: 'Log in to use the live AI consultation for free.',
+  },
+  googleLogin: { ko: '구글로 로그인', en: 'Sign in with Google' },
+  naverLogin: { ko: '네이버로 로그인', en: 'Sign in with Naver' },
+  kakaoLogin: { ko: '카카오로 로그인', en: 'Sign in with Kakao' },
   open: { ko: 'AI 상담 챗봇 열기', en: 'Open AI chatbot' },
   close: { ko: '챗봇 닫기', en: 'Close chatbot' },
   send: { ko: '전송', en: 'Send' },
@@ -33,31 +42,87 @@ const ui = {
   },
 }
 
-// 시나리오형 FAQ — 클릭 시 Edge Function 호출 없이 로컬에서 즉시 답변(비용 0).
-const FAQ_DATA = [
+// 최종 전환 노드 — 모든 여정의 끝단에 결합되는 두 가지 액션.
+const FINAL_ACTIONS = [
+  { id: 'ai', action: 'ai', label: { ko: '✨ AI와 실시간 상담하기', en: '✨ Start live AI chat' } },
+  { id: 'free', action: 'free', label: { ko: '📞 전문가와 무료 상담 신청', en: '📞 Request a free expert consultation' } },
+]
+
+// 관심사별 4단계 FAQ 트리: 1) 고객 분류 → 2) 상세 분류 → 3) 핵심 답변 → 4) 최종 전환.
+const FAQ_TREE = [
   {
-    id: 'solution',
-    q: { ko: '에듀포커스 교육 솔루션은 무엇인가요?', en: 'What is the EDUFOCUS solution?' },
-    a: {
-      ko: '에듀포커스는 AI 기반 취약점 분석으로 학습자 개인의 약점을 정밀 진단하고, 최단 경로로 목표 점수에 도달하는 집중 학습 루틴을 제공합니다. 어학(IELTS·DELF), 자격증(컴활·정보처리기사·한국사능력검정), 교과목 과외(영어·수학·과학·국어), 그리고 AI 학습앱까지 한 곳에서 지원합니다.',
-      en: 'EDUFOCUS uses AI-powered weak-point analysis to precisely diagnose each learner\'s gaps and build a focused study routine that reaches your target score by the shortest path. We cover languages (IELTS·DELF), certifications (Computer Applications·IT Engineer·Korean History), subject tutoring (English·Math·Science·Korean), and our AI learning app — all in one place.',
-    },
+    id: 'interest',
+    label: { ko: '🎯 관심 분야별 탐색', en: '🎯 Explore by field of interest' },
+    children: [
+      {
+        id: 'cert',
+        label: { ko: '국가 자격증 단기 합격', en: 'Fast-track national certifications' },
+        answer: {
+          ko: '에듀포커스는 컴퓨터활용능력(1·2급), 정보처리기사(필기·실기), 한국사능력검정(심화·기본)을 AI 취약점 분석으로 공략합니다. 진단 → 취약 단원 분석 리포트 → 기출 유형 반복 훈련 → 모의고사 피드백으로 이어지는 단기 합격 루틴을 제공합니다.',
+          en: 'EDUFOCUS targets Computer Applications (L1·L2), IT Engineer (written·practical), and Korean History exams with AI weak-point analysis: diagnosis → weak-unit report → repeated past-exam drills → mock-test feedback — a fast-track pass routine.',
+        },
+      },
+      {
+        id: 'language',
+        label: { ko: '글로벌 어학 자격', en: 'Global language certifications' },
+        answer: {
+          ko: 'IELTS와 DELF A1~C2 전 레벨을 영역별(Listening·Reading·Writing·Speaking)로 정밀 진단하고, 목표 점수 달성을 위한 맞춤 학습 루틴과 정기 모의시험·점수 예측 피드백을 제공합니다.',
+          en: 'We precisely diagnose IELTS and DELF A1–C2 across all skills (Listening·Reading·Writing·Speaking), then build a tailored routine with regular mock tests and predicted-score feedback to hit your target.',
+        },
+      },
+      {
+        id: 'tutoring',
+        label: { ko: '국내외 맞춤 교과 과외', en: 'Domestic & overseas subject tutoring' },
+        answer: {
+          ko: '영어·수학·과학·국어 핵심 교과의 취약 단원을 진단해 1:1 맞춤 보완 학습을 제공합니다. 내신·수능은 물론 해외 교과 과정까지 학습자 수준에 맞춰 설계합니다.',
+          en: 'We diagnose weak units in English, Math, Science, and Korean for 1:1 personalized tutoring — covering school exams, CSAT, and overseas curricula tailored to each learner.',
+        },
+      },
+    ],
   },
   {
-    id: 'apply',
-    q: { ko: '맞춤형 컨설턴트 프로그램 신청 방법', en: 'How to apply for the consultant program' },
-    a: {
-      ko: "상단 메뉴의 'AI 학습앱'에서 무료 취약점 진단을 시작하거나, 회원가입 후 마이페이지에서 맞춤형 컨설턴트 프로그램을 신청하실 수 있습니다. 진단 결과를 바탕으로 1:1 맞춤 학습 루틴을 설계해 드립니다. 더 자세한 안내가 필요하시면 아래 실시간 AI 상담을 통해 바로 도와드릴게요!",
-      en: "Start a free weak-point diagnosis from the 'AI Learning App' menu, or sign up and apply for the personalized consultant program from My Page. We'll design a 1:1 study routine based on your results. Need more help? Start a live AI chat below!",
-    },
+    id: 'question',
+    label: { ko: '❓ 질문 종류별 탐색', en: '❓ Explore by question type' },
+    children: [
+      {
+        id: 'pricing',
+        label: { ko: '컨설팅 비용 및 수강료', en: 'Consulting cost & tuition' },
+        answer: {
+          ko: '수강료는 과정(어학·자격증·교과)·기간·1:1 컨설팅 범위에 따라 달라집니다. 무료 취약점 진단 후 맞춤 견적을 안내해 드리며, 정확한 비용은 전문가 상담을 통해 확인하실 수 있습니다.',
+          en: 'Tuition varies by program (language·certification·subjects), duration, and the scope of 1:1 consulting. We provide a tailored quote after a free weak-point diagnosis — for an exact figure, please speak with an expert.',
+        },
+      },
+      {
+        id: 'planner',
+        label: { ko: '학습 스케줄 플래너 작동 방식', en: 'How the study planner works' },
+        answer: {
+          ko: 'AI 학습 플래너는 취약점 분석 결과와 목표 시험일을 기반으로 최단 경로 학습 루틴을 자동 설계하고, 망각 곡선 기반 복습 알림으로 진도를 관리합니다. 주간 성취도 리포트로 달성률을 한눈에 확인할 수 있습니다.',
+          en: 'The AI planner auto-designs the shortest-path routine from your weak-point analysis and target exam date, manages progress with forgetting-curve review reminders, and shows your completion rate in weekly reports.',
+        },
+      },
+    ],
   },
   {
-    id: 'process',
-    q: { ko: '상담 진행 절차와 비용 안내', en: 'Consultation process & pricing' },
-    a: {
-      ko: '상담은 ① 무료 AI 취약점 진단 → ② 영역별 분석 리포트 제공 → ③ 1:1 컨설팅으로 맞춤 학습 루틴 설계 순으로 진행됩니다. 비용은 과정·기간에 따라 달라지므로, 정확한 금액은 고객센터 또는 아래 실시간 AI 상담을 통해 안내받으실 수 있습니다.',
-      en: 'The process is: ① free AI weak-point diagnosis → ② a skill-by-skill analysis report → ③ a 1:1 consultation to design your study routine. Pricing depends on the program and duration — for an exact quote, please reach our support center or start a live AI chat below.',
-    },
+    id: 'purpose',
+    label: { ko: '🚀 고객 목적별 탐색', en: '🚀 Explore by goal' },
+    children: [
+      {
+        id: 'grades',
+        label: { ko: '내신 성적 및 등급 업', en: 'Raise school grades & rank' },
+        answer: {
+          ko: '내신 대비는 학교별 출제 경향과 취약 단원을 진단해 집중 보완합니다. 오답 패턴 분석과 반복 훈련, 실전 유형 적용으로 등급 상승을 목표로 학습 루틴을 설계합니다.',
+          en: 'For school exams we diagnose each school’s question trends and weak units, then design a routine around wrong-answer pattern analysis, repeated drills, and real-format practice to raise your grade.',
+        },
+      },
+      {
+        id: 'study-abroad',
+        label: { ko: '글로벌 대학 진학 및 유학', en: 'Global university admission & study abroad' },
+        answer: {
+          ko: 'IELTS·DELF 등 공인 어학 성적부터 해외 교과 과정 보완까지, 목표 대학·국가에 맞춘 진학 로드맵을 설계합니다. 진학 일정을 역산한 학습 플래너로 체계적으로 준비합니다.',
+          en: 'From official language scores (IELTS·DELF) to overseas curriculum support, we design an admission roadmap tailored to your target school and country, with a planner that works backward from your application timeline.',
+        },
+      },
+    ],
   },
 ]
 
@@ -67,8 +132,9 @@ export default function ChatbotPopup() {
 
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false) // 슬라이드업/페이드인 전환용
-  const [mode, setMode] = useState('faq') // 'faq' | 'ai'
-  const [faqAnswered, setFaqAnswered] = useState(false)
+  const [mode, setMode] = useState('faq') // 'faq' | 'auth' | 'ai'
+  const [options, setOptions] = useState(FAQ_TREE) // 현재 드롭다운 선택지
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState([{ role: 'assistant', content: tt(ui.greeting) }])
@@ -86,26 +152,72 @@ export default function ChatbotPopup() {
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-  }, [messages, loading, mode, faqAnswered])
+  }, [messages, loading, mode])
 
   useEffect(() => {
     if (open && mounted && mode === 'ai') inputRef.current?.focus()
   }, [open, mounted, mode])
 
-  // FAQ 칩 클릭 — 백엔드 호출 없이 로컬 정적 데이터로 즉시 답변 렌더링.
-  function handleFaq(faq) {
+  const isFinal = options === FINAL_ACTIONS
+
+  // 드롭다운 선택 — 선택 시에만 대화가 누적된다.
+  function selectOption(opt) {
+    setDropdownOpen(false)
+    if (opt.action === 'ai') {
+      enterAiConsult(opt)
+      return
+    }
+    if (opt.action === 'free') {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'user', content: tt(opt.label) },
+        { role: 'assistant', content: tt(ui.freeConsult) },
+      ])
+      setOptions(FINAL_ACTIONS)
+      return
+    }
+    // 일반 트리 노드: 답변(리프) 또는 하위 메뉴 안내(분기)
     setMessages((prev) => [
       ...prev,
-      { role: 'user', content: tt(faq.q) },
-      { role: 'assistant', content: tt(faq.a) },
+      { role: 'user', content: tt(opt.label) },
+      { role: 'assistant', content: opt.answer ? tt(opt.answer) : tt(ui.branchFollow) },
     ])
-    setFaqAnswered(true)
+    setOptions(opt.children ? opt.children : FINAL_ACTIONS)
   }
 
-  // FAQ → AI 실시간 상담 모드 전환. 이후 입력은 Edge Function 으로 라우팅.
-  function startAiMode() {
-    setMode('ai')
-    setMessages((prev) => [...prev, { role: 'assistant', content: tt(ui.aiSwitch) }])
+  // AI 실시간 상담 진입 — 로그인 게이트 작동.
+  async function enterAiConsult(opt) {
+    setMessages((prev) => [...prev, { role: 'user', content: tt(opt.label) }])
+    if (!supabase) {
+      setMode('auth')
+      return
+    }
+    try {
+      const { data } = await supabase.auth.getSession()
+      if (data?.session) {
+        setMode('ai')
+        setMessages((prev) => [...prev, { role: 'assistant', content: tt(ui.aiSwitch) }])
+      } else {
+        setMode('auth')
+      }
+    } catch {
+      setMode('auth')
+    }
+  }
+
+  async function handleOAuth(provider) {
+    if (!supabase) {
+      setMessages((prev) => [...prev, { role: 'assistant', content: tt(ui.error) }])
+      return
+    }
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: window.location.href },
+      })
+    } catch {
+      setMessages((prev) => [...prev, { role: 'assistant', content: tt(ui.error) }])
+    }
   }
 
   async function sendMessage() {
@@ -213,66 +325,110 @@ export default function ChatbotPopup() {
                 </div>
               </div>
             )}
+          </div>
 
-            {/* FAQ 칩 — FAQ 모드에서만 노출, 클릭 시 로컬 답변(무비용) */}
-            {!aiMode && (
-              <div className="pt-1">
-                <p className="mb-2 px-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                  {tt(ui.faqHeading)}
-                </p>
-                <div className="grid gap-2">
-                  {FAQ_DATA.map((faq) => (
+          {/* 푸터: 모드별 렌더 — FAQ 드롭다운 / 로그인 게이트 / AI 입력창 */}
+          {mode === 'faq' && (
+            <div className="relative border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-3">
+              {/* 펼침 목록 — 위로 오버레이되어 대화를 밀어 올리지 않음 */}
+              {dropdownOpen && (
+                <div className="absolute bottom-full left-3 right-3 z-20 mb-2 max-h-56 overflow-y-auto rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 py-1 shadow-xl">
+                  {options.map((opt) => (
                     <button
-                      key={faq.id}
+                      key={opt.id}
                       type="button"
-                      onClick={() => handleFaq(faq)}
-                      className="rounded-xl border border-brand-royal/30 dark:border-brand-sky/30 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-left text-sm font-medium text-brand-royal dark:text-brand-sky transition-colors hover:bg-brand-light dark:hover:bg-gray-700"
+                      onClick={() => selectOption(opt)}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-neutral-700 dark:text-neutral-200 transition-colors hover:bg-brand-light dark:hover:bg-gray-700"
                     >
-                      {tt(faq.q)}
+                      {tt(opt.label)}
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* AI 전환 CTA — FAQ 답변을 본 뒤 동적 노출 */}
-          {!aiMode && faqAnswered && (
-            <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 pt-3">
+              )}
               <button
                 type="button"
-                onClick={startAiMode}
-                className="w-full rounded-xl bg-gradient-to-r from-brand-royal to-brand-sky px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:brightness-110"
+                onClick={() => setDropdownOpen((o) => !o)}
+                className="flex w-full items-center justify-between rounded-xl border border-brand-royal/40 dark:border-brand-sky/40 bg-brand-light/60 dark:bg-gray-800 px-4 py-2.5 text-sm font-semibold text-brand-royal dark:text-brand-sky transition-colors hover:bg-brand-light dark:hover:bg-gray-700"
               >
-                {tt(ui.aiCta)}
+                <span>{isFinal ? tt(ui.selectFinal) : tt(ui.selectMenu)}</span>
+                <svg
+                  width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                  className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </button>
             </div>
           )}
 
-          {/* 입력창 — AI 모드에서만 활성화 */}
-          <div className="flex items-end gap-2 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-3">
-            <textarea
-              ref={inputRef}
-              rows={1}
-              value={input}
-              disabled={!aiMode}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={aiMode ? tt(ui.placeholder) : tt(ui.guidePlaceholder)}
-              className="max-h-24 flex-1 resize-none rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 focus:border-brand-royal focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-gray-800/50 dark:focus:border-brand-sky"
-            />
-            <button
-              type="button"
-              aria-label={tt(ui.send)}
-              onClick={sendMessage}
-              disabled={!aiMode || loading || !input.trim()}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-royal text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-brand-sky"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />
-              </svg>
-            </button>
-          </div>
+          {mode === 'auth' && (
+            <div className="space-y-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-4">
+              {/* 프리미엄 마케팅 배너 */}
+              <div className="rounded-xl bg-gradient-to-r from-brand-navy to-brand-royal px-4 py-3 text-center">
+                <p className="text-sm font-bold text-white">{tt(ui.bannerTitle)}</p>
+                <p className="mt-1 text-[11px] text-brand-sky/90">{tt(ui.bannerSub)}</p>
+              </div>
+              {/* 소셜 로그인 버튼 */}
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => handleOAuth('google')}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white px-4 py-2.5 text-sm font-semibold text-neutral-700 transition hover:bg-gray-50"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z" />
+                  </svg>
+                  {tt(ui.googleLogin)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOAuth('naver')}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#03C75A] px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-95"
+                >
+                  <span className="font-extrabold">N</span>
+                  {tt(ui.naverLogin)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOAuth('kakao')}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FEE500] px-4 py-2.5 text-sm font-semibold text-[#191600] transition hover:brightness-95"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#191600">
+                    <path d="M12 3C6.99 3 3 6.2 3 10.13c0 2.52 1.68 4.73 4.2 5.99-.18.64-.66 2.37-.76 2.74-.12.46.17.45.36.33.15-.1 2.36-1.6 3.32-2.26.6.09 1.23.13 1.88.13 5.01 0 9-3.2 9-7.13S17.01 3 12 3z" />
+                  </svg>
+                  {tt(ui.kakaoLogin)}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {mode === 'ai' && (
+            <div className="flex items-end gap-2 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-3">
+              <textarea
+                ref={inputRef}
+                rows={1}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={tt(ui.placeholder)}
+                className="max-h-24 flex-1 resize-none rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 focus:border-brand-royal focus:outline-none dark:focus:border-brand-sky"
+              />
+              <button
+                type="button"
+                aria-label={tt(ui.send)}
+                onClick={sendMessage}
+                disabled={loading || !input.trim()}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-royal text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-brand-sky"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
