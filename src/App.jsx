@@ -3,6 +3,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import ScrollToTopButton from './components/ScrollToTopButton'
+import ChatbotPopup from './components/ChatbotPopup'
 
 import Home from './pages/Home'
 import Languages from './pages/Languages'
@@ -58,6 +59,7 @@ export default function App() {
       </main>
       <Footer />
       <ScrollToTopButton />
+      <ChatbotPopup />
     </div>
   )
 }

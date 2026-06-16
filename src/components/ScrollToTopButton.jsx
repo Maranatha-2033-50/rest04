@@ -16,7 +16,7 @@ export default function ScrollToTopButton() {
       type="button"
       aria-label="맨위로 가기"
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-8 right-8 z-40 flex h-14 w-14 items-center justify-center
+      className="fixed bottom-28 right-8 z-40 flex h-14 w-14 items-center justify-center
                  rounded-full bg-brand-royal dark:bg-brand-sky text-white shadow-lg
                  transition hover:brightness-110"
     >
