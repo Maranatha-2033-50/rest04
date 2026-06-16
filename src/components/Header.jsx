@@ -201,7 +201,7 @@ export default function Header() {
             {/* 햄버거 (모바일) */}
             <button
               type="button"
-              aria-label="메뉴 열기"
+              aria-label={t({ ko: '메뉴 열기', en: 'Open menu' })}
               className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
               onClick={() => setMobileOpen(true)}
             >
@@ -237,7 +237,7 @@ export default function Header() {
                 </button>
                 <button
                   type="button"
-                  aria-label="메뉴 닫기"
+                  aria-label={t({ ko: '메뉴 닫기', en: 'Close menu' })}
                   className="text-2xl text-neutral-500 dark:text-neutral-400"
                   onClick={() => setMobileOpen(false)}
                 >

@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useLang } from '../context/LanguageContext'
 
 const INQUIRY_TYPES = [
-  { value: '', label: '문의 유형을 선택해주세요' },
-  { value: 'languages', label: '어학 문의' },
-  { value: 'certifications', label: '자격증 문의' },
-  { value: 'subjects', label: '교과목 과외 문의' },
-  { value: 'ai-app', label: 'AI 학습앱 문의' },
-  { value: 'system', label: '시스템 및 기타 오류' },
+  { value: '', label: { ko: '문의 유형을 선택해주세요', en: 'Select an inquiry type' } },
+  { value: 'languages', label: { ko: '어학 문의', en: 'Language programs' } },
+  { value: 'certifications', label: { ko: '자격증 문의', en: 'Certification exams' } },
+  { value: 'subjects', label: { ko: '교과목 과외 문의', en: 'Subject tutoring' } },
+  { value: 'ai-app', label: { ko: 'AI 학습앱 문의', en: 'AI learning app' } },
+  { value: 'system', label: { ko: '시스템 및 기타 오류', en: 'System & other issues' } },
 ]
 
 const INITIAL_FORM = {
@@ -16,6 +17,34 @@ const INITIAL_FORM = {
   type: '',
   subject: '',
   message: '',
+}
+
+// 고객센터 다국어 팩
+const T = {
+  pageTitle: { ko: '고객센터', en: 'Support Center' },
+  pageSub: { ko: '문의사항을 남겨주시면 빠르게 답변 드리겠습니다.', en: 'Leave us a message and we’ll respond promptly.' },
+  successTitle: { ko: '문의가 정상적으로 접수되었습니다.', en: 'Your inquiry has been received.' },
+  successNote: { ko: '영업일 기준 1~3일 내에 담당자가 답변 드리겠습니다.', en: 'Our team will reply within 1–3 business days.' },
+  newInquiry: { ko: '새 문의 작성하기', en: 'Write a new inquiry' },
+  badge: { ko: '문의하기', en: 'Contact Us' },
+  formTitle: { ko: '에듀포커스에 문의하세요', en: 'Get in touch with EDUFOCUS' },
+  labelName: { ko: '이름', en: 'Name' },
+  labelEmail: { ko: '이메일 주소', en: 'Email address' },
+  labelType: { ko: '문의 유형', en: 'Inquiry type' },
+  labelSubject: { ko: '제목', en: 'Subject' },
+  labelMessage: { ko: '문의 내용', en: 'Message' },
+  phName: { ko: '홍길동', en: 'e.g. John Doe' },
+  phSubject: { ko: '문의 제목을 입력해주세요', en: 'Enter a subject' },
+  phMessage: { ko: '문의 내용을 자세히 작성해주세요.', en: 'Describe your inquiry in detail.' },
+  submit: { ko: '문의 제출하기', en: 'Submit inquiry' },
+  submitting: { ko: '제출 중...', en: 'Submitting...' },
+  submitError: { ko: '문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', en: 'Something went wrong while sending your inquiry. Please try again shortly.' },
+  vName: { ko: '이름을 입력해주세요.', en: 'Please enter your name.' },
+  vEmail: { ko: '이메일 주소를 입력해주세요.', en: 'Please enter your email address.' },
+  vEmailFormat: { ko: '올바른 이메일 형식이 아닙니다.', en: 'Please enter a valid email address.' },
+  vType: { ko: '문의 유형을 선택해주세요.', en: 'Please select an inquiry type.' },
+  vSubject: { ko: '제목을 입력해주세요.', en: 'Please enter a subject.' },
+  vMessage: { ko: '문의 내용을 입력해주세요.', en: 'Please enter your message.' },
 }
 
 function FieldLabel({ htmlFor, required, children }) {
@@ -38,6 +67,7 @@ const inputBase =
   'focus:ring-2 focus:ring-brand-royal/20 dark:focus:ring-brand-sky/20'
 
 export default function Support() {
+  const { t, lang } = useLang()
   const [form, setForm] = useState(INITIAL_FORM)
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
@@ -48,12 +78,12 @@ export default function Support() {
 
   function validate() {
     const next = {}
-    if (!form.name.trim()) next.name = '이름을 입력해주세요.'
-    if (!form.email.trim()) next.email = '이메일 주소를 입력해주세요.'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) next.email = '올바른 이메일 형식이 아닙니다.'
-    if (!form.type) next.type = '문의 유형을 선택해주세요.'
-    if (!form.subject.trim()) next.subject = '제목을 입력해주세요.'
-    if (!form.message.trim()) next.message = '문의 내용을 입력해주세요.'
+    if (!form.name.trim()) next.name = t(T.vName)
+    if (!form.email.trim()) next.email = t(T.vEmail)
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) next.email = t(T.vEmailFormat)
+    if (!form.type) next.type = t(T.vType)
+    if (!form.subject.trim()) next.subject = t(T.vSubject)
+    if (!form.message.trim()) next.message = t(T.vMessage)
     return next
   }
 
@@ -78,11 +108,11 @@ export default function Support() {
     setSubmitting(false)
 
     if (error) {
-      setSubmitError('문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      setSubmitError(t(T.submitError))
       return
     }
 
-    // Slack 실시간 알림 (VITE_SLACK_WEBHOOK_URL 설정 시 동작)
+    // Slack 실시간 알림 (VITE_SLACK_WEBHOOK_URL 설정 시 동작) — 사내 알림이므로 한국어 고정
     const webhookUrl = import.meta.env.VITE_SLACK_WEBHOOK_URL
     if (webhookUrl) {
       const typeLabel = {
@@ -133,9 +163,9 @@ export default function Support() {
           <p className="text-xs font-semibold tracking-widest text-brand-sky/80 uppercase mb-3">
             SUPPORT
           </p>
-          <h1 className="text-3xl font-extrabold text-white md:text-5xl">고객센터</h1>
+          <h1 className="text-3xl font-extrabold text-white md:text-5xl">{t(T.pageTitle)}</h1>
           <p className="mt-4 text-white/70 text-sm md:text-base">
-            문의사항을 남겨주시면 빠르게 답변 드리겠습니다.
+            {t(T.pageSub)}
           </p>
         </div>
       </div>
@@ -157,33 +187,46 @@ export default function Support() {
                 </svg>
               </div>
               <h2 className="mb-3 text-2xl font-extrabold text-brand-navy dark:text-white">
-                문의가 정상적으로 접수되었습니다.
+                {t(T.successTitle)}
               </h2>
               <p className="mb-2 text-neutral-600 dark:text-neutral-400">
-                <span className="font-semibold text-brand-royal dark:text-brand-sky">{form.email}</span>
-                로 접수 확인 메일이 발송됩니다.
+                {lang === 'ko' ? (
+                  <>
+                    <span className="font-semibold text-brand-royal dark:text-brand-sky">{form.email}</span>
+                    로 접수 확인 메일이 발송됩니다.
+                  </>
+                ) : (
+                  <>
+                    A confirmation email is on its way to{' '}
+                    <span className="font-semibold text-brand-royal dark:text-brand-sky">{form.email}</span>.
+                  </>
+                )}
               </p>
               <p className="text-sm text-neutral-500 dark:text-neutral-500">
-                영업일 기준 1~3일 내에 담당자가 답변 드리겠습니다.
+                {t(T.successNote)}
               </p>
               <button
                 type="button"
                 onClick={() => { setForm(INITIAL_FORM); setSubmitted(false) }}
                 className="mt-8 btn-outline px-8 py-3 text-sm"
               >
-                새 문의 작성하기
+                {t(T.newInquiry)}
               </button>
             </div>
           ) : (
             /* 문의 폼 */
             <div className="card p-8 md:p-10">
               <div className="mb-8">
-                <span className="badge mb-3">문의하기</span>
+                <span className="badge mb-3">{t(T.badge)}</span>
                 <h2 className="text-2xl font-extrabold text-brand-navy dark:text-white">
-                  에듀포커스에 문의하세요
+                  {t(T.formTitle)}
                 </h2>
                 <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                  <span className="text-brand-amber font-semibold">*</span> 표시 항목은 필수 입력사항입니다.
+                  {lang === 'ko' ? (
+                    <><span className="text-brand-amber font-semibold">*</span> 표시 항목은 필수 입력사항입니다.</>
+                  ) : (
+                    <>Fields marked with <span className="text-brand-amber font-semibold">*</span> are required.</>
+                  )}
                 </p>
               </div>
 
@@ -191,17 +234,17 @@ export default function Support() {
                 {/* 이름 + 이메일 */}
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div>
-                    <FieldLabel htmlFor="name" required>이름</FieldLabel>
+                    <FieldLabel htmlFor="name" required>{t(T.labelName)}</FieldLabel>
                     <input
                       id="name" type="text" autoComplete="name"
-                      placeholder="홍길동"
+                      placeholder={t(T.phName)}
                       value={form.name} onChange={set('name')}
                       className={inputBase}
                     />
                     {errors.name && <p className="mt-1.5 text-xs text-red-500">{errors.name}</p>}
                   </div>
                   <div>
-                    <FieldLabel htmlFor="email" required>이메일 주소</FieldLabel>
+                    <FieldLabel htmlFor="email" required>{t(T.labelEmail)}</FieldLabel>
                     <input
                       id="email" type="email" autoComplete="email"
                       placeholder="example@email.com"
@@ -214,15 +257,15 @@ export default function Support() {
 
                 {/* 문의 유형 */}
                 <div>
-                  <FieldLabel htmlFor="type" required>문의 유형</FieldLabel>
+                  <FieldLabel htmlFor="type" required>{t(T.labelType)}</FieldLabel>
                   <select
                     id="type"
                     value={form.type} onChange={set('type')}
                     className={inputBase + ' cursor-pointer'}
                   >
-                    {INQUIRY_TYPES.map((t) => (
-                      <option key={t.value} value={t.value} disabled={t.value === ''}>
-                        {t.label}
+                    {INQUIRY_TYPES.map((opt) => (
+                      <option key={opt.value} value={opt.value} disabled={opt.value === ''}>
+                        {t(opt.label)}
                       </option>
                     ))}
                   </select>
@@ -231,10 +274,10 @@ export default function Support() {
 
                 {/* 제목 */}
                 <div>
-                  <FieldLabel htmlFor="subject" required>제목</FieldLabel>
+                  <FieldLabel htmlFor="subject" required>{t(T.labelSubject)}</FieldLabel>
                   <input
                     id="subject" type="text"
-                    placeholder="문의 제목을 입력해주세요"
+                    placeholder={t(T.phSubject)}
                     value={form.subject} onChange={set('subject')}
                     className={inputBase}
                   />
@@ -243,10 +286,10 @@ export default function Support() {
 
                 {/* 문의 내용 */}
                 <div>
-                  <FieldLabel htmlFor="message" required>문의 내용</FieldLabel>
+                  <FieldLabel htmlFor="message" required>{t(T.labelMessage)}</FieldLabel>
                   <textarea
                     id="message" rows={7}
-                    placeholder="문의 내용을 자세히 작성해주세요."
+                    placeholder={t(T.phMessage)}
                     value={form.message} onChange={set('message')}
                     className={inputBase + ' resize-none leading-relaxed'}
                   />
@@ -267,7 +310,7 @@ export default function Support() {
                     disabled={submitting}
                     className="btn-primary w-full py-3.5 text-base font-bold disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {submitting ? '제출 중...' : '문의 제출하기'}
+                    {submitting ? t(T.submitting) : t(T.submit)}
                   </button>
                 </div>
               </form>

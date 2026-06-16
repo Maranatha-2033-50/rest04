@@ -60,11 +60,12 @@ function LegalContent({ data, isPrivacy }) {
 }
 
 export default function SimplePage({ title, contentKey }) {
-  const { lang } = useLang()
+  const { t, lang } = useLang()
   const content = contentKey ? contentMap[contentKey] : null
   const isPrivacy = contentKey === 'privacy'
 
-  const breadcrumb = lang === 'ko' ? `홈 / ${title}` : `Home / ${title}`
+  const titleText = t(title)
+  const breadcrumb = lang === 'ko' ? `홈 / ${titleText}` : `Home / ${titleText}`
 
   return (
     <div>
@@ -83,7 +84,7 @@ export default function SimplePage({ title, contentKey }) {
             'font-extrabold text-white md:text-5xl',
             isPrivacy ? 'text-4xl' : 'text-3xl',
           ].join(' ')}>
-            {title}
+            {titleText}
           </h1>
           {isPrivacy && (
             <p className="mt-4 text-white/70 text-sm">
@@ -103,10 +104,12 @@ export default function SimplePage({ title, contentKey }) {
       ) : (
         <div className="mx-auto max-w-container section-x py-24 text-center">
           <p className="text-xl font-medium text-neutral-600 dark:text-neutral-400">
-            &ldquo;{title}&rdquo; 페이지 콘텐츠가 준비 중입니다.
+            {lang === 'ko'
+              ? <>&ldquo;{titleText}&rdquo; 페이지 콘텐츠가 준비 중입니다.</>
+              : <>The &ldquo;{titleText}&rdquo; page content is coming soon.</>}
           </p>
           <p className="mt-3 text-neutral-400 dark:text-neutral-500">
-            실제 운영 시 내용으로 교체하세요.
+            {lang === 'ko' ? '실제 운영 시 내용으로 교체하세요.' : 'Replace this with real content before launch.'}
           </p>
         </div>
       )}

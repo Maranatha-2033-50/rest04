@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useLang } from '../context/LanguageContext'
 
 export default function ScrollToTopButton() {
+  const { t } = useLang()
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -14,7 +16,7 @@ export default function ScrollToTopButton() {
   return (
     <button
       type="button"
-      aria-label="맨위로 가기"
+      aria-label={t({ ko: '맨위로 가기', en: 'Scroll to top' })}
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       className="fixed bottom-28 right-8 z-40 flex h-14 w-14 items-center justify-center
                  rounded-full bg-brand-royal dark:bg-brand-sky text-white shadow-lg

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { useLang } from '../context/LanguageContext'
 
 // ============================================================
 // 1:1 무료 맞춤 상담 신청 폼
@@ -23,15 +24,45 @@ import { supabase } from '../lib/supabaseClient'
 // ============================================================
 
 const DOMAINS = [
-  { value: '', label: '관심 교육 도메인을 선택해주세요' },
-  { value: 'domestic', label: '국내 내신/수능' },
-  { value: 'a-level', label: '영국 A-Level' },
-  { value: 'ontario', label: '캐나다 온타리오' },
-  { value: 'ielts-general', label: 'IELTS 일반' },
-  { value: 'ielts-review', label: 'IELTS 첨삭' },
-  { value: 'it-cert', label: 'IT 자격증' },
-  { value: 'korean-history', label: '한국사' },
+  { value: '', label: { ko: '관심 교육 도메인을 선택해주세요', en: 'Select your area of interest' } },
+  { value: 'domestic', label: { ko: '국내 내신/수능', en: 'Korea school & CSAT' } },
+  { value: 'a-level', label: { ko: '영국 A-Level', en: 'UK A-Level' } },
+  { value: 'ontario', label: { ko: '캐나다 온타리오', en: 'Canada Ontario' } },
+  { value: 'ielts-general', label: { ko: 'IELTS 일반', en: 'IELTS General' } },
+  { value: 'ielts-review', label: { ko: 'IELTS 첨삭', en: 'IELTS Review' } },
+  { value: 'it-cert', label: { ko: 'IT 자격증', en: 'IT Certifications' } },
+  { value: 'korean-history', label: { ko: '한국사', en: 'Korean History' } },
 ]
+
+// 맞춤 상담 신청 다국어 팩
+const T = {
+  eyebrow: { ko: 'PREMIUM CONSULTING', en: 'PREMIUM CONSULTING' },
+  pageTitle: { ko: '1:1 무료 맞춤 상담 신청', en: '1:1 Free Personalized Consultation' },
+  pageSub: {
+    ko: '전문 컨설턴트가 학습 목표와 취약점을 진단하고, 합격까지의 최단 경로를 설계해 드립니다.',
+    en: 'Our expert consultants diagnose your goals and weak points and design the shortest path to success.',
+  },
+  successTitle: { ko: '상담 신청이 완료되었습니다.', en: 'Your consultation request is complete.' },
+  newRequest: { ko: '새 상담 신청하기', en: 'Submit another request' },
+  badge: { ko: '무료 상담 신청', en: 'Free Consultation' },
+  formTitle: { ko: '맞춤 상담을 신청하세요', en: 'Request your personalized consultation' },
+  labelName: { ko: '성함', en: 'Full name' },
+  labelPhone: { ko: '연락처', en: 'Phone number' },
+  labelDomain: { ko: '관심 교육 도메인', en: 'Area of interest' },
+  labelMessage: { ko: '문의사항', en: 'Your inquiry' },
+  phName: { ko: '홍길동', en: 'e.g. John Doe' },
+  phMessage: {
+    ko: '현재 학습 상황과 목표, 궁금하신 점을 자유롭게 작성해주세요.',
+    en: 'Tell us about your current situation, goals, and any questions.',
+  },
+  submit: { ko: '무료 상담 신청하기', en: 'Request free consultation' },
+  submitting: { ko: '신청 중...', en: 'Submitting...' },
+  submitError: { ko: '상담 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', en: 'Something went wrong. Please try again shortly.' },
+  vName: { ko: '성함을 입력해주세요.', en: 'Please enter your name.' },
+  vPhone: { ko: '연락처를 입력해주세요.', en: 'Please enter your phone number.' },
+  vDomain: { ko: '관심 교육 도메인을 선택해주세요.', en: 'Please select your area of interest.' },
+  vMessage: { ko: '문의사항을 입력해주세요.', en: 'Please enter your inquiry.' },
+}
 
 // 챗봇·외부 동선에서 넘어오는 intent/category 값을 도메인 value 로 매핑 (별칭 허용).
 const CATEGORY_ALIASES = {
@@ -71,6 +102,7 @@ const inputBase =
   'focus:ring-2 focus:ring-brand-royal/20 dark:focus:ring-brand-sky/20'
 
 export default function ConsultationForm() {
+  const { t, lang } = useLang()
   const [searchParams] = useSearchParams()
 
   const [form, setForm] = useState(() => ({
@@ -88,10 +120,10 @@ export default function ConsultationForm() {
 
   function validate() {
     const next = {}
-    if (!form.name.trim()) next.name = '성함을 입력해주세요.'
-    if (!form.phone.trim()) next.phone = '연락처를 입력해주세요.'
-    if (!form.domain) next.domain = '관심 교육 도메인을 선택해주세요.'
-    if (!form.message.trim()) next.message = '문의사항을 입력해주세요.'
+    if (!form.name.trim()) next.name = t(T.vName)
+    if (!form.phone.trim()) next.phone = t(T.vPhone)
+    if (!form.domain) next.domain = t(T.vDomain)
+    if (!form.message.trim()) next.message = t(T.vMessage)
     return next
   }
 
@@ -121,7 +153,7 @@ export default function ConsultationForm() {
       setSubmitted(true)
     } catch (err) {
       console.error('[consultation] insert 실패:', err)
-      setSubmitError('상담 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      setSubmitError(t(T.submitError))
     } finally {
       setSubmitting(false)
     }
@@ -136,9 +168,9 @@ export default function ConsultationForm() {
           <p className="text-xs font-semibold tracking-widest text-brand-sky/80 uppercase mb-3">
             PREMIUM CONSULTING
           </p>
-          <h1 className="text-3xl font-extrabold text-white md:text-5xl">1:1 무료 맞춤 상담 신청</h1>
+          <h1 className="text-3xl font-extrabold text-white md:text-5xl">{t(T.pageTitle)}</h1>
           <p className="mt-4 text-white/70 text-sm md:text-base">
-            전문 컨설턴트가 학습 목표와 취약점을 진단하고, 합격까지의 최단 경로를 설계해 드립니다.
+            {t(T.pageSub)}
           </p>
         </div>
       </div>
@@ -160,10 +192,14 @@ export default function ConsultationForm() {
                 </svg>
               </div>
               <h2 className="mb-3 text-2xl font-extrabold text-brand-navy dark:text-white">
-                상담 신청이 완료되었습니다.
+                {t(T.successTitle)}
               </h2>
               <p className="mx-auto max-w-md leading-relaxed text-neutral-600 dark:text-neutral-400">
-                성함과 연락처, 문의사항을 남겨주시면 <span className="font-semibold text-brand-royal dark:text-brand-sky">24시간 내로 연락</span> 드리겠습니다.
+                {lang === 'ko' ? (
+                  <>성함과 연락처, 문의사항을 남겨주시면 <span className="font-semibold text-brand-royal dark:text-brand-sky">24시간 내로 연락</span> 드리겠습니다.</>
+                ) : (
+                  <>Leave your name, contact, and inquiry, and we’ll <span className="font-semibold text-brand-royal dark:text-brand-sky">reach out within 24 hours</span>.</>
+                )}
               </p>
               <button
                 type="button"
@@ -173,19 +209,23 @@ export default function ConsultationForm() {
                 }}
                 className="mt-8 btn-outline px-8 py-3 text-sm"
               >
-                새 상담 신청하기
+                {t(T.newRequest)}
               </button>
             </div>
           ) : (
             /* 상담 신청 폼 */
             <div className="card p-8 md:p-10">
               <div className="mb-8">
-                <span className="badge mb-3">무료 상담 신청</span>
+                <span className="badge mb-3">{t(T.badge)}</span>
                 <h2 className="text-2xl font-extrabold text-brand-navy dark:text-white">
-                  맞춤 상담을 신청하세요
+                  {t(T.formTitle)}
                 </h2>
                 <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                  <span className="text-brand-amber font-semibold">*</span> 표시 항목은 필수 입력사항입니다.
+                  {lang === 'ko' ? (
+                    <><span className="text-brand-amber font-semibold">*</span> 표시 항목은 필수 입력사항입니다.</>
+                  ) : (
+                    <>Fields marked with <span className="text-brand-amber font-semibold">*</span> are required.</>
+                  )}
                 </p>
               </div>
 
@@ -193,17 +233,17 @@ export default function ConsultationForm() {
                 {/* 성함 + 연락처 */}
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div>
-                    <FieldLabel htmlFor="name" required>성함</FieldLabel>
+                    <FieldLabel htmlFor="name" required>{t(T.labelName)}</FieldLabel>
                     <input
                       id="name" type="text" autoComplete="name"
-                      placeholder="홍길동"
+                      placeholder={t(T.phName)}
                       value={form.name} onChange={set('name')}
                       className={inputBase}
                     />
                     {errors.name && <p className="mt-1.5 text-xs text-red-500">{errors.name}</p>}
                   </div>
                   <div>
-                    <FieldLabel htmlFor="phone" required>연락처</FieldLabel>
+                    <FieldLabel htmlFor="phone" required>{t(T.labelPhone)}</FieldLabel>
                     <input
                       id="phone" type="tel" autoComplete="tel"
                       placeholder="010-1234-5678"
@@ -216,7 +256,7 @@ export default function ConsultationForm() {
 
                 {/* 관심 교육 도메인 */}
                 <div>
-                  <FieldLabel htmlFor="domain" required>관심 교육 도메인</FieldLabel>
+                  <FieldLabel htmlFor="domain" required>{t(T.labelDomain)}</FieldLabel>
                   <select
                     id="domain"
                     value={form.domain} onChange={set('domain')}
@@ -224,7 +264,7 @@ export default function ConsultationForm() {
                   >
                     {DOMAINS.map((d) => (
                       <option key={d.value} value={d.value} disabled={d.value === ''}>
-                        {d.label}
+                        {t(d.label)}
                       </option>
                     ))}
                   </select>
@@ -233,10 +273,10 @@ export default function ConsultationForm() {
 
                 {/* 문의사항 */}
                 <div>
-                  <FieldLabel htmlFor="message" required>문의사항</FieldLabel>
+                  <FieldLabel htmlFor="message" required>{t(T.labelMessage)}</FieldLabel>
                   <textarea
                     id="message" rows={7}
-                    placeholder="현재 학습 상황과 목표, 궁금하신 점을 자유롭게 작성해주세요."
+                    placeholder={t(T.phMessage)}
                     value={form.message} onChange={set('message')}
                     className={inputBase + ' resize-none leading-relaxed'}
                   />
@@ -257,7 +297,7 @@ export default function ConsultationForm() {
                     disabled={submitting}
                     className="btn-primary w-full py-3.5 text-base font-bold disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {submitting ? '신청 중...' : '무료 상담 신청하기'}
+                    {submitting ? t(T.submitting) : t(T.submit)}
                   </button>
                 </div>
               </form>

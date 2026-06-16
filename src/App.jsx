@@ -55,10 +55,10 @@ export default function App() {
           <Route path="/consultation" element={<ConsultationForm />} />
 
           {/* 약관 / 정책 */}
-          <Route path="/terms" element={<SimplePage title="이용약관" contentKey="terms" />} />
-          <Route path="/privacy" element={<SimplePage title="개인정보처리방침" contentKey="privacy" />} />
+          <Route path="/terms" element={<SimplePage title={{ ko: '이용약관', en: 'Terms of Service' }} contentKey="terms" />} />
+          <Route path="/privacy" element={<SimplePage title={{ ko: '개인정보처리방침', en: 'Privacy Policy' }} contentKey="privacy" />} />
 
-          <Route path="*" element={<SimplePage title="페이지를 찾을 수 없습니다" />} />
+          <Route path="*" element={<SimplePage title={{ ko: '페이지를 찾을 수 없습니다', en: 'Page Not Found' }} />} />
         </Routes>
       </main>
       <Footer />
