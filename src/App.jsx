@@ -14,6 +14,7 @@ import AIApp from './pages/AIApp'
 import About from './pages/About'
 import SimplePage from './pages/SimplePage'
 import Support from './pages/Support'
+import ConsultationForm from './components/ConsultationForm'
 
 export default function App() {
   return (
@@ -49,6 +50,9 @@ export default function App() {
 
           {/* 고객센터 */}
           <Route path="/support" element={<Support />} />
+
+          {/* 1:1 무료 맞춤 상담 신청 */}
+          <Route path="/consultation" element={<ConsultationForm />} />
 
           {/* 약관 / 정책 */}
           <Route path="/terms" element={<SimplePage title="이용약관" contentKey="terms" />} />
